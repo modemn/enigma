@@ -75,11 +75,24 @@ print(enigma.reflector.name)
 
 print()
 print()
+print('Input letter swaps in pairs with spaces in between')
+print('Example input: AB NE LG')
+print('---------------------------------------')
+
+# Collect swap choices
+choice = input()
+swap_choice = choice.split()
+
+# Set the swaps on the enigma's plugboard
+enigma.set_swaps(swap_choice)
+
+print()
+print()
 print('Input your message to encrpyt')
 print('---------------------------------------')
 
 message = input()
-message = message.upper()
+message = message.replace(" ", "").upper()
 
 ciphertext = enigma.encrypt(message)
 

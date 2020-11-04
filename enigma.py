@@ -1,3 +1,4 @@
+from plugboard import Plugboard
 from reflector import Reflector
 from rotor import Rotor
 
@@ -16,6 +17,11 @@ class Enigma():
     def set_reflector(self, reflector):
         self.reflector = Reflector(reflector)
 
+    def set_swaps(self, swap_choices):
+        self.plugboard = Plugboard()
+        for swap_choice in swap_choices:
+            self.plugboard.set_swap(swap_choice[0], swap_choice[1])
+
     def step_rotors(self):
         middle_to_step = self.r_rotor.step()
         left_to_step = False
@@ -25,7 +31,7 @@ class Enigma():
         if (left_to_step):
             print('Stepping left rotor')
             self.l_rotor.step()
-        print(self.l_rotor.current_letter_setting(
+        print('Current rotor setting:', self.l_rotor.current_letter_setting(
         ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
 
     def encrypt(self, plaintext):
@@ -34,16 +40,18 @@ class Enigma():
         ciphertext = ''
         for i, plainletter in enumerate(plaintext):
             print('Plainletter', i+1, ':', plainletter)
-            index = ALPHABET.find(plainletter)
             if (self.stepping_enabled):
                 self.step_rotors()
-            output = self.r_rotor.forward(index)
+            output = self.plugboard.swap(plainletter)
+            output = self.r_rotor.forward(output)
             output = self.m_rotor.forward(output)
             output = self.l_rotor.forward(output)
             output = self.reflector.reflect(output)
             output = self.l_rotor.backward(output)
             output = self.m_rotor.backward(output)
             output = self.r_rotor.backward(output)
+            cipherletter = ALPHABET[int(output)]
+            output = self.plugboard.swap(cipherletter)
             cipherletter = ALPHABET[int(output)]
             print('Cipherletter:', cipherletter)
             print()
