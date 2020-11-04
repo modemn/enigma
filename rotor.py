@@ -1,4 +1,4 @@
-rotor_dict = {
+ROTOR_DICT = {
     'I': {
         'name': 'I',
         'output': 'EKMFLGDQVZNTOWYHXUSPAIBRCJ',
@@ -30,21 +30,36 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 def get_rotor_choices():
-    return list(rotor_dict.keys())
+    return list(ROTOR_DICT.keys())
 
 
 class Rotor:
-    def __init__(self, model) -> None:
-        self.name = rotor_dict[model]['name']
-        self.output = rotor_dict[model]['output']
-        self.notch = rotor_dict[model]['notch']
+    def __init__(self, model):
+        self.name = ROTOR_DICT[model]['name']
+        self.output = ROTOR_DICT[model]['output']
+        self.notch = ROTOR_DICT[model]['notch']
+        self.pos = 0
+
+    def set_start(self, letter):
+        self.pos = ALPHABET.find(letter)
 
     def forward(self, input):
-        index = ALPHABET.find(input)
-        output = self.output[index]
+        output = (input+self.pos) % 26
+        cipherletter = self.output[output]
+        print('->', cipherletter, '(forward through rotor {})'.format(self.name))
+        output = (ALPHABET.find(cipherletter)-self.pos) % 26
         return output
 
     def backward(self, input):
-        index = self.output.find(input)
-        output = ALPHABET[index]
+        output = (input+self.pos) % 26
+        output = self.output.find(ALPHABET[output])
+        cipherletter = ALPHABET[output]
+        print('->', cipherletter, '(backwards through rotor {})'.format(self.name))
+        output = (output-self.pos) % 26
         return output
+
+    def current_letter_setting(self):
+        return ALPHABET[self.pos]
+
+    def step(self):
+        self.pos = (self.pos+1) % 26

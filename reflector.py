@@ -13,11 +13,12 @@ def get_reflector_choices():
 
 
 class Reflector:
-    def __init__(self, model) -> None:
+    def __init__(self, model):
         self.name = reflector_dict[model]['name']
         self.output = reflector_dict[model]['output']
 
     def reflect(self, input):
-        index = ALPHABET.find(input)
-        output = self.output[index]
+        cipherletter = self.output[input]
+        print('->', cipherletter, '(reflector {})'.format(self.name))
+        output = ALPHABET.find(cipherletter)
         return output

@@ -7,9 +7,21 @@ print('ENIGMA SIMULATOR')
 print('****************')
 print()
 
-enigma = Enigma()
+print('Would you like stepping enabled?')
+print('Input Y or N')
+print('---------------------------------------')
+
+choice = input()
+if (choice.upper() == 'Y'):
+    choice = True
+else:
+    choice = False
+
+enigma = Enigma(choice)
 
 all_rotor_choices = rotor.get_rotor_choices()
+print()
+print()
 print(
     'Select left, middle and right rotor from', all_rotor_choices)
 print('Input each rotor number with a space in between')
@@ -24,6 +36,25 @@ rotors_choice = choice.split()
 enigma.set_rotors(rotors_choice)
 
 print(enigma.l_rotor.name, enigma.m_rotor.name, enigma.r_rotor.name)
+
+print()
+print()
+print(
+    'Enter starting letter settings for rotors')
+print('Input each rotor number with a space in between')
+print('Example input: A Y N')
+print('---------------------------------------')
+
+choice = input()
+starting_letters = choice.split()
+
+enigma.l_rotor.set_start(starting_letters[0])
+enigma.m_rotor.set_start(starting_letters[1])
+enigma.r_rotor.set_start(starting_letters[2])
+
+
+print(enigma.l_rotor.current_letter_setting(),
+      enigma.m_rotor.current_letter_setting(), enigma.r_rotor.current_letter_setting())
 
 all_reflector_choices = reflector.get_reflector_choices()
 print()
@@ -50,7 +81,7 @@ print('---------------------------------------')
 message = input()
 message = message.upper()
 
-ciphertext = enigma.input(message)
+ciphertext = enigma.encrypt(message)
 
 print('Plaintext:', message)
 print('Ciphertext:', ciphertext)
