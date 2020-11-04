@@ -16,6 +16,18 @@ class Enigma():
     def set_reflector(self, reflector):
         self.reflector = Reflector(reflector)
 
+    def step_rotors(self):
+        middle_to_step = self.r_rotor.step()
+        left_to_step = False
+        if (middle_to_step):
+            print('Stepping middle rotor')
+            left_to_step = self.m_rotor.step()
+        if (left_to_step):
+            print('Stepping left rotor')
+            self.l_rotor.step()
+        print(self.l_rotor.current_letter_setting(
+        ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
+
     def encrypt(self, plaintext):
         print('ENCRYPTING...')
         print()
@@ -24,7 +36,7 @@ class Enigma():
             print('Plainletter', i+1, ':', plainletter)
             index = ALPHABET.find(plainletter)
             if (self.stepping_enabled):
-                self.r_rotor.step()
+                self.step_rotors()
             output = self.r_rotor.forward(index)
             output = self.m_rotor.forward(output)
             output = self.l_rotor.forward(output)

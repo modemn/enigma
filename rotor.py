@@ -62,4 +62,7 @@ class Rotor:
         return ALPHABET[self.pos]
 
     def step(self):
+        turnover = (self.current_letter_setting() == self.notch)
+        print('TURNOVER')
         self.pos = (self.pos+1) % 26
+        return turnover
