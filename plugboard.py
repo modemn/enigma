@@ -11,7 +11,6 @@ class Plugboard():
         output_list = list(self.output)
         output_list[index_1], output_list[index_2] = output_list[index_2], output_list[index_1]
         self.output = "".join(output_list)
-        print(self.output)
 
     def swap(self, input):
         index = ALPHABET.find(input)

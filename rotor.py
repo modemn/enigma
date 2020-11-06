@@ -43,6 +43,21 @@ class Rotor:
     def set_start(self, letter):
         self.pos = ALPHABET.find(letter)
 
+    def set_ring_setting(self, offset):
+        self.ring_setting = offset+1
+        if (offset != 0):
+            dot_pos = self.output.find('A')
+            new_wiring = ''
+            for char in self.output:
+                new_wiring += ALPHABET[(ALPHABET.find(char)+offset) % 26]
+            new_dot_pos = (dot_pos + offset) % 26
+            print(new_wiring, new_dot_pos)
+
+            while not new_wiring[new_dot_pos] == ALPHABET[offset]:
+                new_wiring = new_wiring[-1:] + new_wiring[:-1]
+
+            self.output = new_wiring
+
     def forward(self, input):
         output = (input+self.pos) % 26
         cipherletter = self.output[output]
