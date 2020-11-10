@@ -39,6 +39,7 @@ class Rotor:
         self.output = ROTOR_DICT[model]['output']
         self.notch = ROTOR_DICT[model]['notch']
         self.pos = 0
+        self.ring_setting = 1
 
     def set_start(self, letter):
         self.pos = ALPHABET.find(letter)
@@ -77,6 +78,7 @@ class Rotor:
         return ALPHABET[self.pos]
 
     def step(self):
+        print("Stepping rotor", self.name)
         turnover = (self.current_letter_setting() == self.notch)
         self.pos = (self.pos+1) % 26
         return turnover

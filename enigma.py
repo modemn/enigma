@@ -36,14 +36,19 @@ class Enigma():
             self.r_rotor.set_ring_setting(int(ring_settings[2])-1)
 
     def step_rotors(self):
-        middle_to_step = self.r_rotor.step()
-        left_to_step = False
-        if (middle_to_step):
-            print('Stepping middle rotor')
-            left_to_step = self.m_rotor.step()
-        if (left_to_step):
-            print('Stepping left rotor')
+        r_notched = (self.r_rotor.current_letter_setting()
+                     == self.r_rotor.notch)
+        m_notched = (self.m_rotor.current_letter_setting()
+                     == self.m_rotor.notch)
+
+        self.r_rotor.step()
+
+        if (r_notched and (not m_notched)):
+            self.m_rotor.step()
+        elif ((r_notched and m_notched) or (m_notched)):
             self.l_rotor.step()
+            self.m_rotor.step()
+
         print('Current rotor setting:', self.l_rotor.current_letter_setting(
         ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
 
