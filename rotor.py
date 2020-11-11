@@ -34,12 +34,14 @@ def get_rotor_choices():
 
 
 class Rotor:
-    def __init__(self, model):
+    def __init__(self, model, printing, start_letter, ring_setting):
         self.name = ROTOR_DICT[model]['name']
         self.output = ROTOR_DICT[model]['output']
         self.notch = ROTOR_DICT[model]['notch']
         self.pos = 0
-        self.ring_setting = 1
+        self.printing = printing
+        self.set_start(start_letter)
+        self.set_ring_setting(ring_setting)
 
     def set_start(self, letter):
         self.pos = ALPHABET.find(letter)
@@ -52,7 +54,6 @@ class Rotor:
             for char in self.output:
                 new_wiring += ALPHABET[(ALPHABET.find(char)+offset) % 26]
             new_dot_pos = (dot_pos + offset) % 26
-            print(new_wiring, new_dot_pos)
 
             while not new_wiring[new_dot_pos] == ALPHABET[offset]:
                 new_wiring = new_wiring[-1:] + new_wiring[:-1]
@@ -62,7 +63,8 @@ class Rotor:
     def forward(self, input):
         output = (input+self.pos) % 26
         cipherletter = self.output[output]
-        print('->', cipherletter, '(forward through rotor {})'.format(self.name))
+        if(self.printing):
+            print('->', cipherletter, '(forward through rotor {})'.format(self.name))
         output = (ALPHABET.find(cipherletter)-self.pos) % 26
         return output
 
@@ -70,7 +72,9 @@ class Rotor:
         output = (input+self.pos) % 26
         output = self.output.find(ALPHABET[output])
         cipherletter = ALPHABET[output]
-        print('->', cipherletter, '(backwards through rotor {})'.format(self.name))
+        if(self.printing):
+            print('->', cipherletter,
+                  '(backwards through rotor {})'.format(self.name))
         output = (output-self.pos) % 26
         return output
 
@@ -78,7 +82,8 @@ class Rotor:
         return ALPHABET[self.pos]
 
     def step(self):
-        print("Stepping rotor", self.name)
+        if(self.printing):
+            print("Stepping rotor", self.name)
         turnover = (self.current_letter_setting() == self.notch)
         self.pos = (self.pos+1) % 26
         return turnover

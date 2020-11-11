@@ -21,8 +21,6 @@ if ((choice.upper() == 'Y') or (len(choice) == 0)):
 else:
     stepping_choice = False
 
-enigma = Enigma(stepping_choice)
-
 all_rotor_choices = rotor.get_rotor_choices()
 print()
 print()
@@ -39,9 +37,6 @@ if (len(choice) == 0):
 else:
     rotors_choice = choice.split()
 
-# Set the rotors on the enigma
-enigma.set_rotors(rotors_choice)
-
 print()
 print()
 print(
@@ -52,9 +47,10 @@ print(colored('---------------------------------------', 'blue'))
 
 choice = input()
 choice = choice.upper()
-starting_letters = choice.split()
-
-enigma.set_rotors_start(starting_letters)
+if (len(choice) == 0):
+    starting_letters_choice = ['A', 'A', 'A']
+else:
+    starting_letters_choice = choice.split()
 
 print()
 print()
@@ -65,9 +61,10 @@ print('Example input: 4 17 8 (Default is 1 1 1)')
 print(colored('---------------------------------------', 'blue'))
 
 choice = input()
-ring_settings = choice.split()
-
-enigma.set_ring_settings(ring_settings)
+if(len(choice) == 0):
+    ring_settings = ['1', '1', '1']
+else:
+    ring_settings = choice.split()
 
 all_reflector_choices = reflector.get_reflector_choices()
 print()
@@ -81,12 +78,9 @@ print(colored('---------------------------------------', 'blue'))
 choice = input()
 choice = choice.upper()
 if (len(choice) == 0):
-    reflector_choice = ['B']
+    reflector_choice = 'B'
 else:
-    reflector_choice = choice.split()
-
-# Set the reflector on the enigma
-enigma.set_reflector(reflector_choice[0])
+    reflector_choice = choice.split()[0]
 
 print()
 print()
@@ -99,8 +93,23 @@ choice = input()
 choice = choice.upper()
 swap_choices = choice.split()
 
-# Set the swaps on the enigma's plugboard
-enigma.set_swaps(swap_choices)
+print()
+print()
+print('Would you like scrambling path printing?')
+print('Input Y or N (Default is Y)')
+print(colored('---------------------------------------', 'blue'))
+
+choice = input()
+if ((choice.upper() == 'Y') or (len(choice) == 0)):
+    printing_choice = True
+else:
+    printing_choice = False
+
+enigma = Enigma(printing_choice, stepping_choice, rotors_choice, starting_letters_choice,
+                ring_settings, reflector_choice, swap_choices)
+
+print(printing_choice, stepping_choice, rotors_choice, starting_letters_choice,
+      ring_settings, reflector_choice, swap_choices)
 
 print()
 print()
@@ -111,10 +120,11 @@ print('Rotors Selected:', enigma.l_rotor.name,
       enigma.m_rotor.name, enigma.r_rotor.name)
 print('Rotor Setting:', enigma.l_rotor.current_letter_setting(),
       enigma.m_rotor.current_letter_setting(), enigma.r_rotor.current_letter_setting())
-print('Rotor ring settings:', enigma.l_rotor.ring_setting,
+print('Rotor Ring Settings:', enigma.l_rotor.ring_setting,
       enigma.m_rotor.ring_setting, enigma.r_rotor.ring_setting)
 print('Reflector Selected:', enigma.reflector.name)
-print('Swapped letters:', swap_choices)
+print('Swapped Letters:', swap_choices)
+print('Scrambling Path Printing:', enigma.printing)
 print(colored('*************************', 'green'))
 
 print()

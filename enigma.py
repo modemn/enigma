@@ -6,34 +6,35 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Enigma():
-    def __init__(self, stepping_enabled):
+    def __init__(self, printing, stepping_enabled, rotors, starting_letters, ring_settings, reflector, letter_swaps):
+        self.set_printing(printing)
+        self.set_stepping(stepping_enabled)
+        self.set_rotors(rotors, starting_letters, ring_settings)
+        self.set_reflector(reflector)
+        self.set_swaps(letter_swaps)
+
+    def set_printing(self, printing):
+        self.printing = printing
+
+    def set_stepping(self, stepping_enabled):
         self.stepping_enabled = stepping_enabled
 
-    def set_rotors(self, rotors):
-        self.l_rotor = Rotor(rotors[0])
-        self.m_rotor = Rotor(rotors[1])
-        self.r_rotor = Rotor(rotors[2])
-
-    def set_rotors_start(self, starting_letters):
-        if (len(starting_letters) != 0):
-            self.l_rotor.set_start(starting_letters[0])
-            self.m_rotor.set_start(starting_letters[1])
-            self.r_rotor.set_start(starting_letters[2])
+    def set_rotors(self, rotors, starting_letters, ring_settings):
+        self.l_rotor = Rotor(rotors[0], self.printing,
+                             starting_letters[0], int(ring_settings[0])-1)
+        self.m_rotor = Rotor(rotors[1], self.printing,
+                             starting_letters[1], int(ring_settings[1])-1)
+        self.r_rotor = Rotor(rotors[2], self.printing,
+                             starting_letters[2], int(ring_settings[2])-1)
 
     def set_reflector(self, reflector):
-        self.reflector = Reflector(reflector)
+        if (len(reflector) != 0):
+            self.reflector = Reflector(reflector, self.printing)
+        else:
+            self.reflector = Reflector('B', self.printing)
 
-    def set_swaps(self, swap_choices):
-        self.plugboard = Plugboard()
-        if (len(swap_choices) != 0):
-            for swap_choice in swap_choices:
-                self.plugboard.set_swap(swap_choice[0], swap_choice[1])
-
-    def set_ring_settings(self, ring_settings):
-        if(len(ring_settings) != 0):
-            self.l_rotor.set_ring_setting(int(ring_settings[0])-1)
-            self.m_rotor.set_ring_setting(int(ring_settings[1])-1)
-            self.r_rotor.set_ring_setting(int(ring_settings[2])-1)
+    def set_swaps(self, letter_swaps):
+        self.plugboard = Plugboard(self.printing, letter_swaps)
 
     def step_rotors(self):
         r_notched = (self.r_rotor.current_letter_setting()
@@ -48,9 +49,9 @@ class Enigma():
         elif ((r_notched and m_notched) or (m_notched)):
             self.l_rotor.step()
             self.m_rotor.step()
-
-        print('Current rotor setting:', self.l_rotor.current_letter_setting(
-        ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
+        if (self.printing):
+            print('Current rotor setting:', self.l_rotor.current_letter_setting(
+            ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
 
     def encrypt(self, plaintext):
         print()
@@ -59,9 +60,10 @@ class Enigma():
         print()
         ciphertext = ''
         for i, plainletter in enumerate(plaintext):
-            print('Plainletter', i+1, ':', plainletter)
             if (self.stepping_enabled):
                 self.step_rotors()
+            if (self.printing):
+                print('Plainletter', i+1, ':', plainletter)
             output = self.plugboard.swap(plainletter)
             output = self.r_rotor.forward(output)
             output = self.m_rotor.forward(output)
@@ -73,8 +75,9 @@ class Enigma():
             cipherletter = ALPHABET[int(output)]
             output = self.plugboard.swap(cipherletter)
             cipherletter = ALPHABET[int(output)]
-            print('Cipherletter:', cipherletter)
-            print()
+            if (self.printing):
+                print('Cipherletter:', cipherletter)
+                print()
             ciphertext += cipherletter
 
         return ciphertext
