@@ -105,11 +105,20 @@ if ((choice.upper() == 'Y') or (len(choice) == 0)):
 else:
     printing_choice = False
 
-enigma = Enigma(printing_choice, stepping_choice, rotors_choice, starting_letters_choice,
-                ring_settings, reflector_choice, swap_choices)
+print()
+print()
+print('Would you like the Engima settings to be saved to a file?')
+print('Input Y or N (Default is Y)')
+print(colored('---------------------------------------', 'blue'))
 
-print(printing_choice, stepping_choice, rotors_choice, starting_letters_choice,
-      ring_settings, reflector_choice, swap_choices)
+choice = input()
+if ((choice.upper() == 'Y') or (len(choice) == 0)):
+    output_choice = True
+else:
+    output_choice = False
+
+enigma = Enigma(output_choice, printing_choice, stepping_choice, rotors_choice, starting_letters_choice,
+                ring_settings, reflector_choice, swap_choices)
 
 print()
 print()

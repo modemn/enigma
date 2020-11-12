@@ -6,15 +6,23 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Enigma():
-    def __init__(self, printing, stepping_enabled, rotors, starting_letters, ring_settings, reflector, letter_swaps):
-        self.set_printing(printing)
+    def __init__(self, output, printing, stepping_enabled, rotors, starting_letters, ring_settings, reflector, letter_swaps):
+        self.output = output
+        self.printing = printing
         self.set_stepping(stepping_enabled)
         self.set_rotors(rotors, starting_letters, ring_settings)
         self.set_reflector(reflector)
         self.set_swaps(letter_swaps)
 
-    def set_printing(self, printing):
-        self.printing = printing
+        if (output):
+            with open('start_settings.txt', 'w') as writer:
+                writer.writelines('Stepping Enabled:' +
+                                  str(stepping_enabled)+'\n')
+                writer.writelines('Rotors:'+str(rotors)+'\n')
+                writer.writelines('Rotor Settings:'+str(starting_letters)+'\n')
+                writer.writelines('Ring Settings:'+str(ring_settings)+'\n')
+                writer.writelines('Reflector:'+str(reflector)+'\n')
+                writer.writelines('Plugboard:'+str(letter_swaps)+'\n')
 
     def set_stepping(self, stepping_enabled):
         self.stepping_enabled = stepping_enabled
@@ -79,5 +87,10 @@ class Enigma():
                 print('Cipherletter:', cipherletter)
                 print()
             ciphertext += cipherletter
+
+        if(self.output):
+            with open('start_settings.txt', 'a+') as writer:
+                writer.write('Plaintext:'+plaintext+'\n')
+                writer.write('Ciphertext:'+ciphertext+'\n')
 
         return ciphertext
