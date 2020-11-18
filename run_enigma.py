@@ -133,7 +133,7 @@ print('Rotor Ring Settings:', enigma.l_rotor.ring_setting,
       enigma.m_rotor.ring_setting, enigma.r_rotor.ring_setting)
 print('Reflector Selected:', enigma.reflector.name)
 print('Swapped Letters:', swap_choices)
-print('Scrambling Path Printing:', enigma.printing)
+print('Scrambling Path Printing:', enigma.printing_enabled)
 print(colored('*************************', 'green'))
 
 print()
