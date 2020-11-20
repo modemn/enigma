@@ -22,7 +22,6 @@ class Enigma():
         self.printing_enabled = printing
 
         self.starting_letters = starting_letters
-        print(starting_letters)
 
         self.stepping_enabled = stepping_enabled
 
@@ -93,7 +92,7 @@ class Enigma():
         ciphertext = ''
         for i, plainletter in enumerate(plaintext):
             if (self.stepping_enabled):
-                self.step_rotors()
+                self.step_rotors(True)
             if (self.printing_enabled):
                 print('Plainletter', i+1, ':', plainletter)
             output = self.plugboard.swap(plainletter)
