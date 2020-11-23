@@ -1,4 +1,5 @@
-from enigma import ALPHABET, Enigma
+from enigma import Enigma
+from indicator import Indicator
 from pprint import pprint
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -36,18 +37,8 @@ class Bombe():
 
         # print(self.scramblers[i].to_string())
 
-        # TODO: Make an indicator component for displaying the possible ring settings
         # Indicator scrambler that shows the possible ring settings when a stop occurs
-        # self.indicator = Enigma(
-        #     False,
-        #     False,
-        #     False,
-        #     [str(b_rotor), str(m_rotor), str(t_rotor)],
-        #     ['Z', 'Z', 'Z'],
-        #     ['1', '1', '1'],
-        #     reflector,
-        #     []
-        # )
+        self.indicator = Indicator(['Z', 'Z', 'Z'])
 
     # Run through the scrmablers in order and print output at each stage
     def run(self):
@@ -73,12 +64,15 @@ class Bombe():
                 middle_row += str(scrambler.m_rotor.current_letter_setting())
                 bottom_row += str(scrambler.l_rotor.current_letter_setting())
 
-            print()
+            top_row += ' '+str(self.indicator.t_rotor.current_letter())
+            middle_row += ' '+str(self.indicator.m_rotor.current_letter())
+            bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
+
+            print(i, '----------------------------------')
             print('Scrambler settings:')
             print(top_row)
             print(middle_row)
             print(bottom_row)
-            # TODO: print the current ring settings as well
             print()
 
             # consistent_letters = []
@@ -99,66 +93,69 @@ class Bombe():
 
             # If consistent letters were found then a stop has occurred
             if(len(consistent_letters)):
-                print('STOP!')
+                print('STOP!', len(consistent_letters),
+                      'letter(s) did not change after scrambling')
                 print()
 
-                # TODO: go through all the consistent letters, not just the first one found
+                for cl in consistent_letters:
+                    # Create dictionary with all the steckers given by the stop
+                    for j in range(len(all_outputs)):
+                        self.steckers[self.path[j % self.num_scramblers]
+                                      ] = all_outputs[j][cl]
 
-                # Create dictionary with all the steckers given by the stop
-                for j in range(len(all_outputs)):
-                    self.steckers[self.path[j % self.num_scramblers]
-                                  ] = all_outputs[j][consistent_letters[0]]
+                    # Go through the steckers and check for contradictions
+                    consistent_steckers = True
+                    for j in self.steckers:
+                        val = self.steckers[j]
+                        if (val in self.steckers.keys()):
+                            if (self.steckers[val] != j):
+                                consistent_steckers = False
 
-                # Go through the steckers and check for contradictions
-                consistent_steckers = True
-                for j in self.steckers:
-                    val = self.steckers[j]
-                    if (val in self.steckers.keys()):
-                        if (self.steckers[val] != j):
-                            consistent_steckers = False
+                    # If no contradictions are found, then print out the stop
+                    # and continue search after the user inputs
+                    if (consistent_steckers):
+                        stop = True
+                        print(ALPHABET[cl], 'stays consistent')
+                        for o in all_outputs:
+                            print(o)
+                        print()
+                        print('##################################')
+                        print('Possible steckers:')
+                        for stecker in self.steckers:
+                            print(stecker, '<->', self.steckers[stecker])
+                        print()
+                        print('Possible ring settings:')
+                        print(
+                            self.indicator.b_rotor.current_letter(),
+                            self.indicator.m_rotor.current_letter(),
+                            self.indicator.t_rotor.current_letter()
+                        )
+                        print('##################################')
+                        input()
+                        print('Continuing search')
+                        print()
 
-                # If no contradictions are found, then print out the stop
-                if (consistent_steckers):
-                    stop = True
-                    print(ALPHABET[consistent_letters[0]])
-                    for o in all_outputs:
-                        print(o)
-                    print()
-                    print('Possible steckers:')
-                    for stecker in self.steckers:
-                        print(stecker, '<->', self.steckers[stecker])
-                    # TODO: print the possible ring settings from the indicator component
-                    input()
+                        for scrambler in self.scramblers:
+                            scrambler.step_rotors(False)
+                        self.indicator.step_rotors()
+                        stop = False
 
-                # If not, then step all scramblers
-                # else:
-                print('Contradiction found, continuing search')
-                print('Step rotors')
-                for scrambler in self.scramblers:
-                    scrambler.step_rotors(False)
-                stop = False
+                    # If not, then step all scramblers
+                    else:
+                        print('//////////////////////////////////////')
+                        print('Contradiction found, continuing search')
+                        print('//////////////////////////////////////')
+                        print()
+                        for scrambler in self.scramblers:
+                            scrambler.step_rotors(False)
+                        self.indicator.step_rotors()
+                        stop = False
 
-            # If not, then all step all scramblers
+            # If not, then step all scramblers
             else:
-                print('Step rotors')
-
-                top_row = ''
-                middle_row = ''
-                bottom_row = ''
-
                 for scrambler in self.scramblers:
-                    top_row += str(scrambler.r_rotor.current_letter_setting())
-                    middle_row += str(scrambler.m_rotor.current_letter_setting())
-                    bottom_row += str(scrambler.l_rotor.current_letter_setting())
                     scrambler.step_rotors(False)
-
-                print(top_row)
-                print(middle_row)
-                print(bottom_row)
-
-                # self.indicator.step_rotors()
-                # print(self.indicator.r_rotor.current_letter_setting(
-                # ), self.indicator.m_rotor.current_letter_setting(), self.indicator.l_rotor.current_letter_setting())
+                self.indicator.step_rotors()
 
             i += 1
 
