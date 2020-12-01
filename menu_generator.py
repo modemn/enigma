@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 # plain_crib = input()
 # cipher_crib = input()
 
-plain_crib = 'XANFANGSUEDAUSGANGBA'
-cipher_crib = 'DXTGNVHVRMMEVOUYFZSL'
+plain_crib = 'WETTERVORHERSAGE'
+cipher_crib = 'SNMKGGSTZZUGARLV'
 
 letters = plain_crib+cipher_crib
 # letters = "".join(set(letters))

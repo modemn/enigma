@@ -35,8 +35,6 @@ class Bombe():
 
         self.path = list(self.steckers.keys())
 
-        # print(self.scramblers[i].to_string())
-
         # Indicator scrambler that shows the possible ring settings when a stop occurs
         self.indicator = Indicator(['Z', 'Z', 'Z'])
 
@@ -93,11 +91,11 @@ class Bombe():
 
             # If consistent letters were found then a stop has occurred
             if(len(consistent_letters)):
-                print('STOP!', len(consistent_letters),
-                      'letter(s) did not change after scrambling')
+                print('STOP! letter(s) did not change after scrambling')
                 print()
 
                 for cl in consistent_letters:
+                    print(ALPHABET[cl], 'did not change')
                     # Create dictionary with all the steckers given by the stop
                     for j in range(len(all_outputs)):
                         self.steckers[self.path[j % self.num_scramblers]
@@ -160,7 +158,7 @@ class Bombe():
             i += 1
 
 
-Bombe(
+b = Bombe(
     'II',
     'V',
     'III',
@@ -169,4 +167,6 @@ Bombe(
         'ZZP'],
     ['EG', 'GR', 'RA', 'AS', 'SV', 'VE'],
     'A'
-).run()
+)
+
+b.run()

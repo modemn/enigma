@@ -129,3 +129,6 @@ class Enigma():
         output += 'Reflector: '+self.reflector.name+'\n'
         output += 'Plugboard: '+self.plugboard.output+'\n'
         return output
+
+    def starting_letters_for_bombe(self):
+        return (''.join(reversed(self.starting_letters)))
