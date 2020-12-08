@@ -6,6 +6,64 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Bombe():
+    """ A Bombe Machine
+
+    Creates a Bombe machine with specified rotors and settings from a menu. Using this input, a graph is made and the alphabet travserses through it in a DFS fashion. When a loop is detected, the output alphabet is checked to see if any letter has not changed, this indicates a possible consistent set of letter steckerings. The steckers are checked for consistency, and if they are found to be valid, they are saved to a full steckering.
+
+    Args:
+        t_rotor (str): This is the name of the top rotor ['I', 'II', 'III', 'IV', 'V'].
+        m_rotor (str): This is the name of the middle rotor ['I', 'II', 'III', 'IV', 'V'].
+        b_rotor (str): This is the name of the bottom rotor ['I', 'II', 'III', 'IV', 'V'].
+        reflector (str): This is the name of the reflector from ['A', 'B', 'C'].
+        scrambler_settings (list(str)): This is a list of letters representing the starting letters of each scrambler in order.
+        connections (list(str)): This is a list of the letters connected to each other. Each scrambler represents a letter. This order matches the list of scramblers.
+        input (str): This is the input letters used as the source node of the DFS.
+
+    Attributes:
+        input (str): This is the input letters used as the source node of the DFS.
+        scramblers (list(Scrambler)): This is a list of scramblers using the Enigma class set with the settings given in the arguments.
+        indicator (Indicator): This is an Indicator which shows the possible ring settings at each stop.
+        steckers (dict): This is a dictionary of each letter mapped to the possible steckered letter
+        menu (dict): This is the menu graph generated from the input arguments. Keys are letters which represent nodes, values are lists of letters representing edges between nodes. Edges are between letters given as connections in the argument.
+
+    Methods:
+        run(): Runs the Bombe machine, printing out stops as and when they are found
+
+        generate_steckers(path, outputs):
+            Generates a steckering dictionary given the path and list of outputs
+            Args:
+                path (str): Letters representing which nodes the alphabet has traversed through
+                outputs (list(str)): The output from each scrambler the alphabet has traversed through
+            Returns:
+                steckers (dict): A dictionary of each letter mapped to the possible steckered letter.
+
+        check_steckers(steckers):
+            Checks the conisitency of a given steckering
+            Args:
+                steckers (dict): A dictionary of each letter mapped to the possible steckered letter.
+            Returns:
+                (bool): Whether the steckers given were consistent or not
+
+        dfs(v, parent, visited, path, dfs_tree_paths, to_scramble):
+            A recursive function to traverse the menu and push the alphabet through each eage
+            Args:
+                v (str): The current node in the traversal
+                parent (str): The parent of the current node, v.
+                visited (list(bool)): List of booleans, ith bool represents the ith node visited status.
+                path (str): A string of letters representing the path traversed prior to arriving at the current node, v.
+                dfs_tree_paths (dict): A dictionary holding all paths and a list of the outputs after each traversal of that path.
+                to_scramble (str): The string of letters to input into the next edge to receive the output scrambled output. This starts of as the usual alphabet.
+
+        scramble(starting_letters, input):
+            Scrambles the given input through the scramblers whose starting letters are the ones given.
+            Args:
+                starting_letters (str): The letters given as the starting letters of the scrmabler that the input should be scrambled through
+                input (str): The string to scrambler through the given scrambler
+            Returns:
+                (str): The output of the scrambler.
+
+    """
+
     def __init__(self, t_rotor, m_rotor, b_rotor, reflector, scrambler_settings, connections, input):
         # Initialize the input letter to DFS with as the source node
         self.input = input
@@ -50,13 +108,13 @@ class Bombe():
 
             # Create the forward and backward edge tuples, both edges
             # to make the menu undirected
-            # The first item in the tuple is the node this node is linked to
+            # The first item in the tuple is this node's neighbour
             # The second item in the tuple is the scrambler's starting letters
             # associated with that connection
             forward_edge = (connections[i][1], scrambler_settings[i])
             backward_edge = (connections[i][0], scrambler_settings[i])
 
-            # Add the tuple to the menu if it doesn't already exist
+            # Add both edges to the menu if it doesn't already exist
             if forward_edge not in self.menu[connections[i][0]]:
                 self.menu[connections[i][0]].append(forward_edge)
 
@@ -98,15 +156,12 @@ class Bombe():
                 visited[i] = False
 
             # Initialize dictionary keeping track of the paths and their outputs
-            dfs_tree_paths = {
-                self.input: [ALPHABET]
-            }
+            dfs_tree_paths = {self.input: [ALPHABET]}
 
             # Initialize list keeping track of all the possible steckers generated
             possible_steckers = []
 
             # DFS with the input as the source node
-            # therefore the path is initialized to 's' for source
             self.dfs(self.input, 0, visited, str(
                 self.input), dfs_tree_paths, ALPHABET)
 
@@ -202,7 +257,7 @@ class Bombe():
 
             return True
 
-        # If not, then no consistent letters were found
+        # If there are no steckers, then no consistent letters were found
         # so no need to save
         else:
             return False
