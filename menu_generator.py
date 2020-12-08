@@ -1,14 +1,16 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
-# plain_crib = input()
-# cipher_crib = input()
+ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 plain_crib = 'WETTERVORHERSAGE'
 cipher_crib = 'SNMKGGSTZZUGARLV'
+starting_letters = 'ZZZ'
+top_idx = ALPHABET.find(starting_letters[0])
+middle_idx = ALPHABET.find(starting_letters[1])
+bottom_idx = ALPHABET.find(starting_letters[2])
 
 letters = plain_crib+cipher_crib
-# letters = "".join(set(letters))
 
 menu = nx.Graph()
 
@@ -18,7 +20,15 @@ connections = tuple(zip(plain_crib, cipher_crib))
 
 edge_labels = {}
 for i in range(len(connections)):
-    edge_labels[connections[i]] = str(i+1)
+    bottom_idx = (bottom_idx + 1) % 26
+    if (bottom_idx == ALPHABET.find(starting_letters[2])):
+        middle_idx = (middle_idx + 1) % 26
+        if (middle_idx == ALPHABET.find(starting_letters[1])):
+            top_idx = (top_idx + 1) % 26
+
+    label = ALPHABET[top_idx]+ALPHABET[middle_idx]+ALPHABET[bottom_idx]
+
+    edge_labels[connections[i]] = label
 
 menu.add_edges_from(connections)
 
@@ -35,7 +45,3 @@ nx.draw_networkx_edge_labels(
 
 plt.axis('off')
 plt.show()
-# plt.savefig('menu.png')
-
-# nx.draw(menu, with_labels=True, font_weight='bold')
-# plt.show()
