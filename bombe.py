@@ -11,9 +11,10 @@ class Bombe():
     Creates a Bombe machine with specified rotors and settings from a menu. Using this input, a graph is made and the alphabet travserses through it in a DFS fashion. When a loop is detected, the output alphabet is checked to see if any letter has not changed, this indicates a possible consistent set of letter steckerings. The steckers are checked for consistency, and if they are found to be valid, they are saved to a full steckering.
 
     Args:
-        t_rotor (str): This is the name of the top rotor ['I', 'II', 'III', 'IV', 'V'].
+        t_rotor (str): This is the name of the top rotor (represents the leftmost rotor on the enigma) ['I', 'II', 'III', 'IV', 'V'].
         m_rotor (str): This is the name of the middle rotor ['I', 'II', 'III', 'IV', 'V'].
-        b_rotor (str): This is the name of the bottom rotor ['I', 'II', 'III', 'IV', 'V'].
+        b_rotor (str): This is the name of the bottom rotor (represents the rightmost rotor on the enigma) ['I', 'II', 'III', 'IV', 'V'].
+        indicator (str): This is the letters for the indicator drum to start with. Top rotor is the first letter and so on.
         reflector (str): This is the name of the reflector from ['A', 'B', 'C'].
         scrambler_settings (list(str)): This is a list of letters representing the starting letters of each scrambler in order.
         connections (list(str)): This is a list of the letters connected to each other. Each scrambler represents a letter. This order matches the list of scramblers.
@@ -34,8 +35,6 @@ class Bombe():
             Args:
                 path (str): Letters representing which nodes the alphabet has traversed through
                 outputs (list(str)): The output from each scrambler the alphabet has traversed through
-            Returns:
-                steckers (dict): A dictionary of each letter mapped to the possible steckered letter.
 
         check_steckers(steckers):
             Checks the conisitency of a given steckering
@@ -48,7 +47,6 @@ class Bombe():
             A recursive function to traverse the menu and push the alphabet through each eage
             Args:
                 v (str): The current node in the traversal
-                parent (str): The parent of the current node, v.
                 visited (list(bool)): List of booleans, ith bool represents the ith node visited status.
                 path (str): A string of letters representing the path traversed prior to arriving at the current node, v.
                 dfs_tree_paths (dict): A dictionary holding all paths and a list of the outputs after each traversal of that path.
@@ -64,7 +62,7 @@ class Bombe():
 
     """
 
-    def __init__(self, t_rotor, m_rotor, b_rotor, reflector, scrambler_settings, connections, input):
+    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input):
         # Initialize the input letter to DFS with as the source node
         self.input = input
 
@@ -76,7 +74,7 @@ class Bombe():
                     False,
                     False,
                     False,
-                    [str(b_rotor), str(m_rotor), str(t_rotor)],
+                    [str(t_rotor), str(m_rotor), str(b_rotor)],
                     list(scrambler_settings[i])[::-1],
                     ['1', '1', '1'],
                     reflector,
@@ -85,7 +83,7 @@ class Bombe():
             )
 
         # Initialize indicator scrambler
-        self.indicator = Indicator(['Z', 'Z', 'Z'])
+        self.indicator = Indicator([indicator[0], indicator[1], indicator[2]])
 
         # Initialize possible stecker dictionary
         self.steckers = {}
@@ -130,6 +128,11 @@ class Bombe():
         # While we are not done going through the search space
         # and a stop hasn't occurred
         while ((iteration < 17576) and (not stop)):
+
+            # Reset all steckers
+            for letter in ALPHABET:
+                self.steckers[letter] = ''
+
             top_row = ''
             middle_row = ''
             bottom_row = ''
@@ -143,12 +146,12 @@ class Bombe():
             middle_row += ' '+str(self.indicator.m_rotor.current_letter())
             bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
 
-            # print(iteration, '----------------------------------')
-            # print('Scrambler settings:')
-            # print(top_row)
-            # print(middle_row)
-            # print(bottom_row)
-            # print()
+            print(iteration, '----------------------------------')
+            print('Scrambler settings:')
+            print(top_row)
+            print(middle_row)
+            print(bottom_row)
+            print()
 
             # Intialize dictionary keeping track of visited nodes
             visited = {}
@@ -158,27 +161,61 @@ class Bombe():
             # Initialize dictionary keeping track of the paths and their outputs
             dfs_tree_paths = {self.input: [ALPHABET]}
 
-            # Initialize list keeping track of all the possible steckers generated
-            possible_steckers = []
-
             # DFS with the input as the source node
-            self.dfs(self.input, 0, visited, str(
-                self.input), dfs_tree_paths, ALPHABET)
+            self.dfs(
+                self.input,  # current node
+                0,  # parent of this node, initialised to 0 since this is the source
+                visited,  # visited list
+                str(self.input),  # path so far, initialized to just the input
+                dfs_tree_paths,  # dictionary of all paths and all outputs
+                ALPHABET  # initial string to scramble
+            )
 
-            # Iterate through the paths to find ones with loops in them
+            # Iterate through the paths and save the closures
+            closures = []
             for path_string in dfs_tree_paths.keys():
                 if not (len(set(path_string)) == len(path_string)):
-                    # Generate the steckers associated with the looped path
-                    steckers = self.generate_steckers(
-                        path_string, dfs_tree_paths[path_string])
+                    closures.append(path_string)
 
-                    # And if the steckers are consistent, save them
-                    if (self.check_steckers(steckers)):
-                        possible_steckers.append(steckers)
+            all_consistent_letters = []
 
-            if (len(possible_steckers)):
+            # Iterate through the closures
+            valid_stop = True
+            for closure in closures:
+                consistent_letters = []
+
+                # Find all letters that stay the same after going through all the scramblers
+                for i in range(26):
+                    if(ALPHABET[i] == dfs_tree_paths[closure][-1][i]):
+                        consistent_letters.append(ALPHABET[i])
+
+                # If there are no consistent letters or there are multiple, then invalid stop
+                if (len(consistent_letters) != 1):
+                    print(consistent_letters, '<- consistent letters')
+                    valid_stop = False
+                    break
+                # # Or if there are multiple different consistent letters, then invalid stop
+                # elif (len(set(consistent_letters) != 1)):
+                #     valid_stop = False
+                #     break
+                # Otherwise, generate and add to the potential steckers
+                else:
+                    all_consistent_letters.append(consistent_letters)
+                    self.generate_steckers(
+                        closure, dfs_tree_paths[closure], consistent_letters[0])
+
+            if ((self.indicator.b_rotor.current_letter() == 'X')):
+                if ((self.indicator.m_rotor.current_letter() == 'K')):
+                    if ((self.indicator.t_rotor.current_letter() == 'D')):
+                        pprint(dfs_tree_paths)
+
+            # If the steckers are consistent and there was only 1 consistent letter per closure
+            if (self.check_steckers(self.steckers) and valid_stop):
+                for closure in closures:
+                    pprint(dfs_tree_paths[closure])
+                print(all_consistent_letters)
                 print('Possible steckers:')
-                pprint(possible_steckers)
+                pprint(self.steckers)
                 print()
                 print('Possible ring settings:')
                 print(
@@ -186,7 +223,6 @@ class Bombe():
                     self.indicator.m_rotor.current_letter(),
                     self.indicator.b_rotor.current_letter()
                 )
-                input()
 
             # Step scramblers
             for scrambler in self.scramblers:
@@ -198,44 +234,20 @@ class Bombe():
             iteration += 1
 
     # Function that geneates steckers and checks if they are consistent
-    def generate_steckers(self, path, outputs):
-        print(path)
-        pprint(outputs)
-        # Check if there are any letters that don't change after
-        # being scrambled through the loop
-        consistent_letters = []
-        for i in range(26):
-            if(ALPHABET[i] == outputs[-1][i]):
-                consistent_letters.append(ALPHABET[i])
+    def generate_steckers(self, path, outputs, consistent_letter):
+        # Construct the steckering
+        for i in range(len(outputs)):
+            # Extract the steckering from the outputs
+            self.steckers[path[i % len(self.scramblers)]
+                          ] += outputs[i][ALPHABET.find(consistent_letter)]
 
-        print(consistent_letters)
-
-        # Initialize possible steckers
-        steckers = {}
-        for letter in ALPHABET:
-            steckers[letter] = ''
-
-        # If there were consistent letters, then build
-        # the steckering
-        if (len(consistent_letters)):
-
-            # Iterate through all the consistent letters
-            for cl in consistent_letters:
-
-                # Construct the steckering
-                for i in range(len(outputs)):
-                    # Extract the steckering from the outputs
-                    steckers[path[i % len(self.scramblers)]
-                             ] += outputs[i][ALPHABET.find(cl)]
-
-                    # Input the diagonal board connection too:
-                    # If A steckerd to B, then B is steckered to A
-                    steckers[outputs[i][ALPHABET.find(
-                        cl)]] += path[i % len(self.scramblers)]
-
-        return steckers
+            # Input the diagonal board connection too:
+            # If A steckerd to B, then B is steckered to A
+            self.steckers[outputs[i][ALPHABET.find(
+                consistent_letter)]] += path[i % len(self.scramblers)]
 
     # Function that check if given steckers have no contradictions
+
     def check_steckers(self, steckers):
         # Check if there are any steckers at all
         values = ''.join(steckers.values())
@@ -262,20 +274,27 @@ class Bombe():
 
     # Recursive function that creates tree paths using DFS
     def dfs(self, v, parent, visited, path, dfs_tree_paths, to_scramble):
+        # print('At node', v)
+        # print('Path so far', path)
+        # print('What I need to scramble', to_scramble)
         # Record that node v has been visited
         visited[v] = True
 
         # Iterate through the neigbhours of v
         for i in self.menu[v]:
 
-            # Extend the path with the current node v
-            extended_path = path+str(i[0])
-
             # If the node hasn't been visited before
             if not visited[i[0]]:
 
+                # Extend the path with the neighbour i
+                # print('Extending path with', i[0])
+                extended_path = path+str(i[0])
+                # print('Path now', extended_path)
+
                 # Scramble the input alphabet
+                # print('Scrambling', to_scramble, 'through scrambler', i[1])
                 scrambler_output = self.scramble(i[1], to_scramble)
+                # print('Scrambler output', scrambler_output)
 
                 # Append it on to the output alphabets from the path
                 path_outputs = dfs_tree_paths[path] + [scrambler_output]
@@ -284,16 +303,37 @@ class Bombe():
                 # and their outputs
                 dfs_tree_paths[extended_path] = path_outputs
 
+                # print('Recursing!')
+
                 # Recurse with i as the source node and the extended path
                 self.dfs(i[0], v, visited, extended_path,
                          dfs_tree_paths, scrambler_output)
 
-            # If it has been visited before and it is not the parent
-            # then a loop has been found
-            elif (i[0] != parent):
+            # If the node has been visited and it was not this
+            # node's parent, then a loop is found, scramble one last time
+            elif (visited[i[0]] and i[0] != parent):
+                # print('Found a loop!')
+                # Extend the path with the neighbour i
+                # print('Extending path with', i[0])
+                extended_path = path+str(i[0])
+                # print('Path now', extended_path)
+
+                # Scramble the input alphabet
+                # print('Scrambling', to_scramble, 'through scrambler', i[1])
                 scrambler_output = self.scramble(i[1], to_scramble)
+                # print('Scrambler output', scrambler_output)
+
+                # Append it on to the output alphabets from the path
                 path_outputs = dfs_tree_paths[path] + [scrambler_output]
+
+                # Insert it into the dictionary that holds all the paths
+                # and their outputs
                 dfs_tree_paths[extended_path] = path_outputs
+
+            # else:
+                # print('Already visited', i[0], 'trying next one')
+
+        # print('Backtracking!')
 
     # Function that returns the encryption of the input
     # through a scrambler whose starting letters are given
@@ -305,17 +345,62 @@ class Bombe():
         # Return the output of scrambling the input through the scrambler
         return self.scramblers[scrambler_idx].encrypt(input)
 
+# Reflector: B
+# Wheels: II-V-III
+# Crib: WETTERVORHERSAGE
+# Cipher crib: SNMKGGSTZZUGARLV
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'V',  # MIDDLE ROTOR
+#     'III',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
+#         'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
+#     ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
+#         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
+#     'E'  # INPUT LETTER
+# )
 
+# Reflector: B
+# Wheels: III-II-V
+# Start: M F I
+# Rings: 07 20 05 (G T E)
+# Plugged: JA NG LW CU ED BH QM VF ZK
+# Crib: VELITESSECILLUMDOLORE
+# Cipher crib: ETXCBIWZOXKAFNOJWMYKX
+# b = Bombe(
+#     'III',  # TOP / LEFT ROTOR
+#     'II',  # MIDDLE ROTOR
+#     'V',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZF', 'ZZD', 'ZZJ', 'ZZC', 'ZZR', 'ZZO', 'ZZI',
+#         'ZZU', 'ZZK', 'ZZT', 'ZZA'],  # SCRAMBLER SETTINGS
+#     ['EI',  'IC',  'CX',  'XL',  'LM',  'MO',  'OE',
+#         'EX',  'IK',  'KR',  'EV'],  # CONNECTIONS
+#     'E'  # INPUT LETTER
+# )
+
+
+# Reflector: B
+# Wheels: III - II - V
+# Start: U C R
+# Rings: 14 09 20
+# Plugged: LS VY MT EW QG DX JZ IP FC BU
+# Crib: ANATTACKONDURHAMAT
+# Cipher crib:  ZPJABYGHRHGYZJILRJ
 b = Bombe(
-    'II',  # TOP / RIGHT ROTOR
-    'V',  # MIDDLE ROTOR
-    'III',  # BOTTOM / LEFT ROTOR
+    'III',  # TOP / LEFT ROTOR
+    'II',  # MIDDLE ROTOR
+    'V',  # BOTTOM / RIGHT ROTOR
+    'ZZZ',
     'B',  # REFLECTOR
-    ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
-        'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
-    ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
-        'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
-    'E'  # INPUT LETTER
+    ['ZZA', 'ZZM', 'ZZQ', 'ZZD', 'ZZR', 'ZZC', 'ZZI', 'ZZE',
+        'ZZF', 'ZZL', 'ZZO', 'ZZN'],  # SCRAMBLER SETTINGS
+    ['AZ',  'ZR',  'RA',  'AT',  'TJ',  'JA',  'RO',
+        'TB',  'AY',  'YU',  'AI',  'JH'],  # CONNECTIONS
+    'A'  # INPUT LETTER
 )
 
 b.run()
