@@ -6,14 +6,14 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 # plain_crib = 'VELITESSECILLUMDOLORE'.upper()
 # cipher_crib = 'ETXCBIWZOXKAFNOJWMYKX'.upper()
 
-# plain_crib = 'Loremipsumdolorsitametconsectetur'.upper()
-# cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
+plain_crib = 'Loremipsumdolorsitametconsectetur'.upper()
+cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
 
 # plain_crib = 'WETTERVORHERSAGE'.upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'.upper()
 
-plain_crib = 'ANATTACKONDURHAMAT'.upper()
-cipher_crib = 'ZPJABYGHRHGYZJILRJ'.upper()
+# plain_crib = 'ANATTACKONDURHAMAT'.upper()
+# cipher_crib = 'ZPJABYGHRHGYZJILRJ'.upper()
 
 starting_letters = 'ZZZ'
 top_idx = ALPHABET.find(starting_letters[0])

@@ -60,6 +60,12 @@ class Bombe():
             Returns:
                 (str): The output of the scrambler.
 
+        print_steckers():
+            Prints the steckers with pairs of letters being plugged and spaces between each pair
+
+        print_ring_settings():
+            Prints the ring settings as number poisitions and letters
+
     """
 
     def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input):
@@ -75,7 +81,7 @@ class Bombe():
                     False,
                     False,
                     [str(t_rotor), str(m_rotor), str(b_rotor)],
-                    list(scrambler_settings[i])[::-1],
+                    list(scrambler_settings[i]),
                     ['1', '1', '1'],
                     reflector,
                     []
@@ -108,7 +114,7 @@ class Bombe():
             # to make the menu undirected
             # The first item in the tuple is this node's neighbour
             # The second item in the tuple is the scrambler's starting letters
-            # associated with that connection
+            # associated with that connection (edge labels)
             forward_edge = (connections[i][1], scrambler_settings[i])
             backward_edge = (connections[i][0], scrambler_settings[i])
 
@@ -129,18 +135,14 @@ class Bombe():
         # and a stop hasn't occurred
         while ((iteration < 17576) and (not stop)):
 
-            # Reset all steckers
-            for letter in ALPHABET:
-                self.steckers[letter] = ''
-
             top_row = ''
             middle_row = ''
             bottom_row = ''
 
             for scrambler in self.scramblers:
-                top_row += str(scrambler.r_rotor.current_letter_setting())
+                top_row += str(scrambler.l_rotor.current_letter_setting())
                 middle_row += str(scrambler.m_rotor.current_letter_setting())
-                bottom_row += str(scrambler.l_rotor.current_letter_setting())
+                bottom_row += str(scrambler.r_rotor.current_letter_setting())
 
             top_row += ' '+str(self.indicator.t_rotor.current_letter())
             middle_row += ' '+str(self.indicator.m_rotor.current_letter())
@@ -152,6 +154,10 @@ class Bombe():
             print(middle_row)
             print(bottom_row)
             print()
+
+            # Reset all steckers
+            for letter in ALPHABET:
+                self.steckers[letter] = ''
 
             # Intialize dictionary keeping track of visited nodes
             visited = {}
@@ -191,7 +197,8 @@ class Bombe():
 
                 # If there are no consistent letters or there are multiple, then invalid stop
                 if (len(consistent_letters) != 1):
-                    print(consistent_letters, '<- consistent letters')
+                    print(consistent_letters,
+                          '<- multiple/no consistent letters, invalid stop!')
                     valid_stop = False
                     break
                 # # Or if there are multiple different consistent letters, then invalid stop
@@ -204,29 +211,24 @@ class Bombe():
                     self.generate_steckers(
                         closure, dfs_tree_paths[closure], consistent_letters[0])
 
-            if ((self.indicator.b_rotor.current_letter() == 'X')):
-                if ((self.indicator.m_rotor.current_letter() == 'K')):
-                    if ((self.indicator.t_rotor.current_letter() == 'D')):
-                        pprint(dfs_tree_paths)
-
             # If the steckers are consistent and there was only 1 consistent letter per closure
             if (self.check_steckers(self.steckers) and valid_stop):
+                print('Outputs through closures:')
                 for closure in closures:
                     pprint(dfs_tree_paths[closure])
-                print(all_consistent_letters)
+                    print()
+                print('Consistent letters:', all_consistent_letters)
+                print()
                 print('Possible steckers:')
-                pprint(self.steckers)
+                self.print_steckers()
                 print()
                 print('Possible ring settings:')
-                print(
-                    self.indicator.t_rotor.current_letter(),
-                    self.indicator.m_rotor.current_letter(),
-                    self.indicator.b_rotor.current_letter()
-                )
+                self.print_ring_settings()
+                input()
 
             # Step scramblers
             for scrambler in self.scramblers:
-                scrambler.step_rotors(False)
+                scrambler.step_rotors(True)
 
             # Step indicator
             self.indicator.step_rotors()
@@ -274,9 +276,7 @@ class Bombe():
 
     # Recursive function that creates tree paths using DFS
     def dfs(self, v, parent, visited, path, dfs_tree_paths, to_scramble):
-        # print('At node', v)
-        # print('Path so far', path)
-        # print('What I need to scramble', to_scramble)
+
         # Record that node v has been visited
         visited[v] = True
 
@@ -287,14 +287,10 @@ class Bombe():
             if not visited[i[0]]:
 
                 # Extend the path with the neighbour i
-                # print('Extending path with', i[0])
                 extended_path = path+str(i[0])
-                # print('Path now', extended_path)
 
                 # Scramble the input alphabet
-                # print('Scrambling', to_scramble, 'through scrambler', i[1])
                 scrambler_output = self.scramble(i[1], to_scramble)
-                # print('Scrambler output', scrambler_output)
 
                 # Append it on to the output alphabets from the path
                 path_outputs = dfs_tree_paths[path] + [scrambler_output]
@@ -302,8 +298,6 @@ class Bombe():
                 # Insert it into the dictionary that holds all the paths
                 # and their outputs
                 dfs_tree_paths[extended_path] = path_outputs
-
-                # print('Recursing!')
 
                 # Recurse with i as the source node and the extended path
                 self.dfs(i[0], v, visited, extended_path,
@@ -314,14 +308,10 @@ class Bombe():
             elif (visited[i[0]] and i[0] != parent):
                 # print('Found a loop!')
                 # Extend the path with the neighbour i
-                # print('Extending path with', i[0])
                 extended_path = path+str(i[0])
-                # print('Path now', extended_path)
 
                 # Scramble the input alphabet
-                # print('Scrambling', to_scramble, 'through scrambler', i[1])
                 scrambler_output = self.scramble(i[1], to_scramble)
-                # print('Scrambler output', scrambler_output)
 
                 # Append it on to the output alphabets from the path
                 path_outputs = dfs_tree_paths[path] + [scrambler_output]
@@ -330,20 +320,33 @@ class Bombe():
                 # and their outputs
                 dfs_tree_paths[extended_path] = path_outputs
 
-            # else:
-                # print('Already visited', i[0], 'trying next one')
-
-        # print('Backtracking!')
-
     # Function that returns the encryption of the input
     # through a scrambler whose starting letters are given
     def scramble(self, starting_letters, input):
         # Find the index of the scrambler whose starting letters are the ones given
-        scrambler_idx = [x.starting_letters_for_bombe()
-                         for x in self.scramblers].index(starting_letters)
+        scrambler_idx = [''.join(x.starting_letters) for x in self.scramblers].index(
+            starting_letters)
 
         # Return the output of scrambling the input through the scrambler
         return self.scramblers[scrambler_idx].encrypt(input)
+
+    def print_steckers(self):
+        to_print = ''
+        for s in self.steckers.keys():
+            if ((len(self.steckers[s]) > 0) and (s != self.steckers[s]) and (s not in to_print)):
+                to_print += s+self.steckers[s]+' '
+        print(to_print)
+
+    def print_ring_settings(self):
+        to_print = ''
+        to_print += self.indicator.t_rotor.current_letter()+' '
+        to_print += self.indicator.m_rotor.current_letter()+' '
+        to_print += self.indicator.b_rotor.current_letter()+' - '
+        to_print += str(ALPHABET.find(self.indicator.t_rotor.current_letter())+1)+' '
+        to_print += str(ALPHABET.find(self.indicator.m_rotor.current_letter())+1)+' '
+        to_print += str(ALPHABET.find(self.indicator.b_rotor.current_letter())+1)
+        print(to_print)
+
 
 # Reflector: B
 # Wheels: II-V-III
@@ -368,7 +371,7 @@ class Bombe():
 # Rings: 07 20 05 (G T E)
 # Plugged: JA NG LW CU ED BH QM VF ZK
 # Crib: VELITESSECILLUMDOLORE
-# Cipher crib: ETXCBIWZOXKAFNOJWMYKX
+# Cipher crib:
 # b = Bombe(
 #     'III',  # TOP / LEFT ROTOR
 #     'II',  # MIDDLE ROTOR
@@ -382,7 +385,6 @@ class Bombe():
 #     'E'  # INPUT LETTER
 # )
 
-
 # Reflector: B
 # Wheels: III - II - V
 # Start: U C R
@@ -390,17 +392,38 @@ class Bombe():
 # Plugged: LS VY MT EW QG DX JZ IP FC BU
 # Crib: ANATTACKONDURHAMAT
 # Cipher crib:  ZPJABYGHRHGYZJILRJ
+# b = Bombe(
+#     'III',  # TOP / LEFT ROTOR
+#     'II',  # MIDDLE ROTOR
+#     'V',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZA', 'ZZM', 'ZZQ', 'ZZD', 'ZZR', 'ZZC', 'ZZI', 'ZZE',
+#         'ZZF', 'ZZL', 'ZZO', 'ZZN'],  # SCRAMBLER SETTINGS
+#     ['AZ',  'ZR',  'RA',  'AT',  'TJ',  'JA',  'RO',
+#         'TB',  'AY',  'YU',  'AI',  'JH'],  # CONNECTIONS
+#     'A'  # INPUT LETTER
+# )
+
+
+# Reflector: B
+# Wheels: III - II - V
+# Start: M F I
+# Rings: 07 20 05
+# Plugged: JA NG LW CU ED BH QM VF ZK
+# Crib: LOREMIPSUMDOLORSITAMETCONSECTETUR
+# Cipher crib:  DZPLBKWVJKQMRHXYYIKIVWMEBRYDNSKLQ
 b = Bombe(
     'III',  # TOP / LEFT ROTOR
     'II',  # MIDDLE ROTOR
     'V',  # BOTTOM / RIGHT ROTOR
     'ZZZ',
     'B',  # REFLECTOR
-    ['ZZA', 'ZZM', 'ZZQ', 'ZZD', 'ZZR', 'ZZC', 'ZZI', 'ZZE',
-        'ZZF', 'ZZL', 'ZZO', 'ZZN'],  # SCRAMBLER SETTINGS
-    ['AZ',  'ZR',  'RA',  'AT',  'TJ',  'JA',  'RO',
-        'TB',  'AY',  'YU',  'AI',  'JH'],  # CONNECTIONS
-    'A'  # INPUT LETTER
+    ['ZZR', 'ZZQ', 'ZZP', 'ZAZ', 'ZZC', 'ZZG', 'ZZV', 'ZAC',
+        'ZZY', 'ZZE', 'ZZT', 'ZZR'],  # SCRAMBLER SETTINGS
+    ['TI',  'IY',  'YS',  'SR',  'RP',  'PW',  'WT',
+        'TN',  'NB',  'BM',  'MI',  'IT'],  # CONNECTIONS
+    'T'  # INPUT LETTER
 )
 
 b.run()

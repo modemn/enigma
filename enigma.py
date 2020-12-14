@@ -58,8 +58,8 @@ class Enigma():
                 writer.writelines('Reflector:'+str(reflector)+'\n')
                 writer.writelines('Plugboard:'+str(letter_swaps)+'\n')
 
-    def step_rotors(self, notching):
-        if (notching):
+    def step_rotors(self, from_bombe):
+        if (not from_bombe):
             r_notched = (self.r_rotor.current_letter_setting()
                          == self.r_rotor.notch)
             m_notched = (self.m_rotor.current_letter_setting()
@@ -72,12 +72,12 @@ class Enigma():
             elif ((r_notched and m_notched) or (m_notched)):
                 self.l_rotor.step()
                 self.m_rotor.step()
-        elif(not notching):
-            self.r_rotor.step()
-            if (self.r_rotor.current_letter_setting() == self.starting_letters[2]):
+        elif(from_bombe):
+            self.l_rotor.step()
+            if (self.l_rotor.current_letter_setting() == self.starting_letters[0]):
                 self.m_rotor.step()
                 if (self.m_rotor.current_letter_setting() == self.starting_letters[1]):
-                    self.l_rotor.step()
+                    self.r_rotor.step()
 
         if (self.printing_enabled):
             print('Current rotor setting:', self.l_rotor.current_letter_setting(
@@ -129,6 +129,3 @@ class Enigma():
         output += 'Reflector: '+self.reflector.name+'\n'
         output += 'Plugboard: '+self.plugboard.output+'\n'
         return output
-
-    def starting_letters_for_bombe(self):
-        return (''.join(reversed(self.starting_letters)))
