@@ -190,28 +190,41 @@ class Bombe():
             for closure in closures:
                 consistent_letters = []
 
-                # Find all letters that stay the same after going through all the scramblers
+                # Find all letters that stay the same after traversing the loop of scramblers
                 for i in range(26):
                     if(ALPHABET[i] == dfs_tree_paths[closure][-1][i]):
                         consistent_letters.append(ALPHABET[i])
 
-                # If there are no consistent letters or there are multiple, then invalid stop
+                # If there are no consistent letters, then invalid stop
                 if (len(consistent_letters) != 1):
-                    print(consistent_letters,
-                          '<- multiple/no consistent letters, invalid stop!')
+                    print('No consistent letters, invalid stop!')
                     valid_stop = False
                     break
-                # # Or if there are multiple different consistent letters, then invalid stop
-                # elif (len(set(consistent_letters) != 1)):
-                #     valid_stop = False
-                #     break
-                # Otherwise, generate and add to the potential steckers
+                elif (len(consistent_letters) != 1):
+                    print(consistent_letters,
+                          '<- many consistent letters, valid stop!')
+                    all_consistent_letters.append(consistent_letters)
+                    self.generate_steckers(
+                        closure, dfs_tree_paths[closure], consistent_letters[0])
                 else:
                     all_consistent_letters.append(consistent_letters)
                     self.generate_steckers(
                         closure, dfs_tree_paths[closure], consistent_letters[0])
 
-            # If the steckers are consistent and there was only 1 consistent letter per closure
+                # pprint(self.steckers)
+
+                # # Iterate through the different paths in the menu and generate the steckers from them
+                for path in dfs_tree_paths:
+                    # print(path)
+                    # print(dfs_tree_paths[path])
+                    # print(consistent_letters[0])
+                    self.generate_steckers(
+                        path, dfs_tree_paths[path], consistent_letters[0])
+
+                # pprint(self.steckers)
+                # input()
+
+            # If the steckers are consistent and there was at least 1 consistent letter, then stop!
             if (self.check_steckers(self.steckers) and valid_stop):
                 print('Outputs through closures:')
                 for closure in closures:
@@ -352,18 +365,18 @@ class Bombe():
 # Wheels: II-V-III
 # Crib: WETTERVORHERSAGE
 # Cipher crib: SNMKGGSTZZUGARLV
-# b = Bombe(
-#     'II',  # TOP / LEFT ROTOR
-#     'V',  # MIDDLE ROTOR
-#     'III',  # BOTTOM / RIGHT ROTOR
-#     'ZZZ',
-#     'B',  # REFLECTOR
-#     ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
-#         'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
-#     ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
-#         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
-#     'E'  # INPUT LETTER
-# )
+b = Bombe(
+    'II',  # TOP / LEFT ROTOR
+    'V',  # MIDDLE ROTOR
+    'III',  # BOTTOM / RIGHT ROTOR
+    'ZZZ',
+    'B',  # REFLECTOR
+    ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
+        'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
+    ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
+        'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
+    'E'  # INPUT LETTER
+)
 
 # Reflector: B
 # Wheels: III-II-V
@@ -413,17 +426,17 @@ class Bombe():
 # Plugged: JA NG LW CU ED BH QM VF ZK
 # Crib: LOREMIPSUMDOLORSITAMETCONSECTETUR
 # Cipher crib:  DZPLBKWVJKQMRHXYYIKIVWMEBRYDNSKLQ
-b = Bombe(
-    'III',  # TOP / LEFT ROTOR
-    'II',  # MIDDLE ROTOR
-    'V',  # BOTTOM / RIGHT ROTOR
-    'ZZZ',
-    'B',  # REFLECTOR
-    ['ZZR', 'ZZQ', 'ZZP', 'ZAZ', 'ZZC', 'ZZG', 'ZZV', 'ZAC',
-        'ZZY', 'ZZE', 'ZZT', 'ZZR'],  # SCRAMBLER SETTINGS
-    ['TI',  'IY',  'YS',  'SR',  'RP',  'PW',  'WT',
-        'TN',  'NB',  'BM',  'MI',  'IT'],  # CONNECTIONS
-    'T'  # INPUT LETTER
-)
+# b = Bombe(
+#     'III',  # TOP / LEFT ROTOR
+#     'II',  # MIDDLE ROTOR
+#     'V',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZR', 'ZZQ', 'ZZP', 'ZAZ', 'ZZC', 'ZZG', 'ZZV', 'ZAC',
+#         'ZZY', 'ZZE', 'ZZT', 'ZZR'],  # SCRAMBLER SETTINGS
+#     ['TI',  'IY',  'YS',  'SR',  'RP',  'PW',  'WT',
+#         'TN',  'NB',  'BM',  'MI',  'IT'],  # CONNECTIONS
+#     'T'  # INPUT LETTER
+# )
 
 b.run()
