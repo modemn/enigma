@@ -1,3 +1,4 @@
+from os import altsep
 from enigma import Enigma
 from indicator import Indicator
 from pprint import pprint
@@ -69,6 +70,34 @@ class Bombe():
     """
 
     def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input):
+        # Store rotors for outputting at a stop
+        self.l_rotor = t_rotor
+        self.m_rotor = m_rotor
+        self.r_rotor = b_rotor
+
+        # Calculate what the starting letter should really be for outputting at a stop
+        self.starting_letters = ''
+        if ((self.l_rotor == 'I') or (self.l_rotor == 'II') or (self.l_rotor == 'III')):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
+        elif (self.l_rotor == 'IV'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
+        elif (self.l_rotor == 'V'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
+
+        if ((self.m_rotor == 'I') or (self.m_rotor == 'II') or (self.m_rotor == 'III')):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
+        elif (self.m_rotor == 'IV'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
+        elif (self.m_rotor == 'V'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
+
+        if ((self.r_rotor == 'I') or (self.r_rotor == 'II') or (self.r_rotor == 'III')):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
+        elif (self.r_rotor == 'IV'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
+        elif (self.r_rotor == 'V'):
+            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
+
         # Initialize the input letter to DFS with as the source node
         self.input = input
 
@@ -155,10 +184,6 @@ class Bombe():
             print(bottom_row)
             print()
 
-            # Reset all steckers
-            for letter in ALPHABET:
-                self.steckers[letter] = ''
-
             # Intialize dictionary keeping track of visited nodes
             visited = {}
             for i in list(self.menu.keys()):
@@ -183,12 +208,11 @@ class Bombe():
                 if not (len(set(path_string)) == len(path_string)):
                     closures.append(path_string)
 
-            all_consistent_letters = []
+            valid_stop = True
+            consistent_letters = []
 
             # Iterate through the closures
-            valid_stop = True
             for closure in closures:
-                consistent_letters = []
 
                 # Find all letters that stay the same after traversing the loop of scramblers
                 for i in range(26):
@@ -196,48 +220,49 @@ class Bombe():
                         consistent_letters.append(ALPHABET[i])
 
                 # If there are no consistent letters, then invalid stop
-                if (len(consistent_letters) != 1):
-                    print('No consistent letters, invalid stop!')
+                if (len(consistent_letters) < 1):
                     valid_stop = False
                     break
-                elif (len(consistent_letters) != 1):
-                    print(consistent_letters,
-                          '<- many consistent letters, valid stop!')
-                    all_consistent_letters.append(consistent_letters)
+
+                # Check whether any of the consistent letters found give a valid steckering
+                for cl in consistent_letters:
+                    # Reset all steckers
+                    for letter in ALPHABET:
+                        self.steckers[letter] = ''
+
                     self.generate_steckers(
-                        closure, dfs_tree_paths[closure], consistent_letters[0])
-                else:
-                    all_consistent_letters.append(consistent_letters)
-                    self.generate_steckers(
-                        closure, dfs_tree_paths[closure], consistent_letters[0])
+                        closure, dfs_tree_paths[closure], cl)
 
-                # pprint(self.steckers)
+                    # Add the steckers deduced from non-closure paths
+                    for path in dfs_tree_paths:
+                        self.generate_steckers(path, dfs_tree_paths[path], cl)
 
-                # # Iterate through the different paths in the menu and generate the steckers from them
-                for path in dfs_tree_paths:
-                    # print(path)
-                    # print(dfs_tree_paths[path])
-                    # print(consistent_letters[0])
-                    self.generate_steckers(
-                        path, dfs_tree_paths[path], consistent_letters[0])
+                    # If the steckers are consistent and there was at least 1 consistent letter, then stop!
+                    if (self.check_steckers(self.steckers) and valid_stop):
+                        print(
+                            '######################## STOP ########################')
 
-                # pprint(self.steckers)
-                # input()
+                        print('Outputs through closures:')
+                        for closure in closures:
+                            pprint(dfs_tree_paths[closure])
+                            print()
+                        print('Consistent letters:', consistent_letters)
+                        print()
 
-            # If the steckers are consistent and there was at least 1 consistent letter, then stop!
-            if (self.check_steckers(self.steckers) and valid_stop):
-                print('Outputs through closures:')
-                for closure in closures:
-                    pprint(dfs_tree_paths[closure])
-                    print()
-                print('Consistent letters:', all_consistent_letters)
-                print()
-                print('Possible steckers:')
-                self.print_steckers()
-                print()
-                print('Possible ring settings:')
-                self.print_ring_settings()
-                input()
+                        print()
+                        print('Rotors:', self.l_rotor,
+                              self.m_rotor, self.r_rotor)
+                        print()
+                        print('Starting letters:', self.starting_letters)
+                        print()
+                        print('Possible steckers:', self.print_steckers())
+                        print()
+                        print('Possible ring settings:',
+                              self.print_ring_settings())
+                        print()
+                        print(
+                            '######################## STOP ########################')
+                        input()
 
             # Step scramblers
             for scrambler in self.scramblers:
@@ -277,7 +302,6 @@ class Bombe():
                 # If the number of steckerings is still more than 1
                 # then there must be a contradiction
                 if (len(steckers[i]) > 1):
-                    print(i, 'steckered to two letters, contradiction!')
                     return False
 
             return True
@@ -346,9 +370,9 @@ class Bombe():
     def print_steckers(self):
         to_print = ''
         for s in self.steckers.keys():
-            if ((len(self.steckers[s]) > 0) and (s != self.steckers[s]) and (s not in to_print)):
+            if ((len(self.steckers[s]) > 0) and (s not in to_print)):
                 to_print += s+self.steckers[s]+' '
-        print(to_print)
+        return to_print
 
     def print_ring_settings(self):
         to_print = ''
@@ -358,7 +382,7 @@ class Bombe():
         to_print += str(ALPHABET.find(self.indicator.t_rotor.current_letter())+1)+' '
         to_print += str(ALPHABET.find(self.indicator.m_rotor.current_letter())+1)+' '
         to_print += str(ALPHABET.find(self.indicator.b_rotor.current_letter())+1)
-        print(to_print)
+        return to_print
 
 
 # Reflector: B
