@@ -389,17 +389,72 @@ class Bombe():
 # Wheels: II-V-III
 # Crib: WETTERVORHERSAGE
 # Cipher crib: SNMKGGSTZZUGARLV
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'V',  # MIDDLE ROTOR
+#     'III',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
+#         'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
+#     ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
+#         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
+#     'E'  # INPUT LETTER
+# )
+
+# Reflector: B
+# Wheels:  II-III-V
+# Crib: THEGERMANSBELIEVED
+# Cipher crib: CMFRUIBIGUMBSGOSNY
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'III',  # MIDDLE ROTOR
+#     'V',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZF', 'ZZN', 'ZZD', 'ZZI', 'ZZQ', 'ZZL', 'ZZK', 'ZZB',
+#         'ZZE', 'ZZJ', 'ZZM', 'ZZO'],  # SCRAMBLER SETTINGS
+#     ['RI',  'IG',  'GR',  'GN',  'NE',  'EB',  'BM',
+#         'MH',  'EU',  'US',  'SL',  'EO'],  # CONNECTIONS
+#     'R'  # INPUT LETTER
+# )
+
+# Reflector: B
+# Wheels:  II-III-I
+# Starting Letters: UYM
+# Plugged: IF JB QM RN SC VA
+# Crib: THEENIGMACODEWASTHE
+# Cipher crib: OQNBYVZTHUAJFBFZQAA
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'III',  # MIDDLE ROTOR
+#     'I',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZQ', 'ZZB', 'ZZR', 'ZZK', 'ZZA', 'ZZH', 'ZZS', 'ZZM',
+#         'ZZO', 'ZZC', 'ZZE', 'ZZD'],  # SCRAMBLER SETTINGS
+#     ['TQ',  'QH',  'HA',  'AO',  'OT',  'TM',  'AE',
+#         'EF',  'FA',  'EN',  'NY',  'EB'],  # CONNECTIONS
+#     'A'  # INPUT LETTER
+# )
+
+# Reflector: B
+# Wheels:  V-IV-III
+# Starting Letters: SIZ
+# Plugged: AF GS OC RH VM YW NK PX EL
+# Crib: TOBEORNOTTOBETHATISTHE
+# Cipher crib: BYIKGHTEACAVXQXRIDWBUJ
 b = Bombe(
-    'II',  # TOP / LEFT ROTOR
-    'V',  # MIDDLE ROTOR
+    'V',  # TOP / LEFT ROTOR
+    'IV',  # MIDDLE ROTOR
     'III',  # BOTTOM / RIGHT ROTOR
     'ZZZ',
     'B',  # REFLECTOR
-    ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
-        'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
-    ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
-        'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
-    'E'  # INPUT LETTER
+    ['ZZQ', 'ZZC', 'ZZT', 'ZZI', 'ZZP', 'ZZF', 'ZZO', 'ZZM',
+        'ZZH', 'ZZK', 'ZZG', 'ZZR'],  # SCRAMBLER SETTINGS
+    ['TI',  'IB',  'BT',  'TA',  'AR',  'RH',  'HX',
+        'XE',  'EO',  'OA',  'TB',  'ID'],  # CONNECTIONS
+    'T'  # INPUT LETTER
 )
 
 

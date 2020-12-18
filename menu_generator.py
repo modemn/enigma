@@ -6,8 +6,8 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 # plain_crib = 'VELITESSECILLUMDOLORE'.upper()
 # cipher_crib = 'ETXCBIWZOXKAFNOJWMYKX'.upper()
 
-plain_crib = 'Loremipsumdolorsitametconsectetur'.upper()
-cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
+# plain_crib = 'Loremipsumdolorsitametconsectetur'.upper()
+# cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
 
 # plain_crib = 'WETTERVORHERSAGE'.upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'.upper()
@@ -15,7 +15,20 @@ cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
 # plain_crib = 'ANATTACKONDURHAMAT'.upper()
 # cipher_crib = 'ZPJABYGHRHGYZJILRJ'.upper()
 
-starting_letters = 'ZZZ'
+print('Plain crib:')
+plain_crib = input().replace(" ", "").upper()
+
+print('Cipher crib:')
+cipher_crib = input().replace(" ", "").upper()
+
+print('Starting letters:')
+starting_letters = input().replace(" ", "").upper()
+
+assert len(starting_letters) == 3, 'There should be 3 starting letters!'
+assert len(plain_crib) == len(
+    cipher_crib), 'The cipher and plain cribs should be of the same length'
+
+
 top_idx = ALPHABET.find(starting_letters[0])
 middle_idx = ALPHABET.find(starting_letters[1])
 bottom_idx = ALPHABET.find(starting_letters[2])
