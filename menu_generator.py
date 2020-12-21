@@ -3,18 +3,6 @@ import matplotlib.pyplot as plt
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-# plain_crib = 'VELITESSECILLUMDOLORE'.upper()
-# cipher_crib = 'ETXCBIWZOXKAFNOJWMYKX'.upper()
-
-# plain_crib = 'Loremipsumdolorsitametconsectetur'.upper()
-# cipher_crib = 'dzplbkwvjkqmrhxyyikivwmebrydnsklq'.upper()
-
-# plain_crib = 'WETTERVORHERSAGE'.upper()
-# cipher_crib = 'SNMKGGSTZZUGARLV'.upper()
-
-# plain_crib = 'ANATTACKONDURHAMAT'.upper()
-# cipher_crib = 'ZPJABYGHRHGYZJILRJ'.upper()
-
 print('Plain crib:')
 plain_crib = input().replace(" ", "").upper()
 

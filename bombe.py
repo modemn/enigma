@@ -77,26 +77,8 @@ class Bombe():
 
         # Calculate what the starting letter should really be for outputting at a stop
         self.starting_letters = ''
-        if ((self.l_rotor == 'I') or (self.l_rotor == 'II') or (self.l_rotor == 'III')):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
-        elif (self.l_rotor == 'IV'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
-        elif (self.l_rotor == 'V'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
-
-        if ((self.m_rotor == 'I') or (self.m_rotor == 'II') or (self.m_rotor == 'III')):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
-        elif (self.m_rotor == 'IV'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
-        elif (self.m_rotor == 'V'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
-
-        if ((self.r_rotor == 'I') or (self.r_rotor == 'II') or (self.r_rotor == 'III')):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-1]
-        elif (self.r_rotor == 'IV'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-2]
-        elif (self.r_rotor == 'V'):
-            self.starting_letters += ALPHABET[ALPHABET.find(indicator[0])-3]
+        for letter in indicator:
+            self.starting_letters += ALPHABET[ALPHABET.find(letter)-1]
 
         # Initialize the input letter to DFS with as the source node
         self.input = input
@@ -385,11 +367,13 @@ class Bombe():
         return to_print
 
 
+# ------------------------------------------------------------------------
+# INPUT:
 # Reflector: B
-# Wheels: II-V-III
+# Wheels: II V III
 # Crib: WETTERVORHERSAGE
 # Cipher crib: SNMKGGSTZZUGARLV
-# Decoded? NO
+# ------------------------------------------------------------------------
 # b = Bombe(
 #     'II',  # TOP / LEFT ROTOR
 #     'V',  # MIDDLE ROTOR
@@ -402,61 +386,103 @@ class Bombe():
 #         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
 #     'E'  # INPUT LETTER
 # )
-
+# ------------------------------------------------------------------------
+# OUTPUT:
+# Starting letters: YWY
+# Possible steckers: AD ET FU GQ HM JL NV PZ RR SS
+# Possible ring settings: D M X - 4 13 24
+# ------------------------------------------------------------------------
+# COMMENTS:
+# Should  be DKX, middle rotor off by two
+##########################################################################
 # Reflector: B
-# Wheels:  II-III-V
+# Wheels:  II III IV
+# Starting Letters: IQK
+# Plugged: OM HG LD EB AS IV XU FW ZR KJ
+# Crib: THEENIGMACODEWASTHE
+# Cipher crib: UJLHTQBQUGAJFOJQHLV
+# ------------------------------------------------------------------------
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'III',  # MIDDLE ROTOR
+#     'IV',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZD', 'ZZC', 'ZZR', 'ZZQ', 'ZZA', 'ZZI', 'ZZO', 'ZZB',
+#         'ZZE', 'ZZM', 'ZZK', 'ZZN'],  # SCRAMBLER SETTINGS
+#     ['HE',  'EL',  'LH',  'HT',  'TU',  'UA',  'AJ',
+#         'JH',  'TN',  'EF',  'AO',  'OW'],  # CONNECTIONS
+#     'H'  # INPUT LETTER
+# )
+# ------------------------------------------------------------------------
+# OUTPUT:
+# Starting letters: YYX
+# Possible steckers: AS BE DL FW GH JK MO NN TT UX
+# Possible ring settings: Q I O - 17 9 15
+# ------------------------------------------------------------------------
+# COMMENTS:
+# Enigma output (with proper ring settings): the envgma codj gdblrf
+# Online simulator shows the ring settings should be QIN, so the IV rotor
+# offset is messing something up.
+# Can infer that VI should be steckered
+# Middle rotor also turns apparently because goes to gibberish.
+##########################################################################
+# Reflector: B
+# Wheels:  II III V
 # Crib: THEGERMANSBELIEVED
 # Cipher crib: CMFRUIBIGUMBSGOSNY
-# Decoded? NO
+# ------------------------------------------------------------------------
 # b = Bombe(
 #     'II',  # TOP / LEFT ROTOR
 #     'III',  # MIDDLE ROTOR
 #     'V',  # BOTTOM / RIGHT ROTOR
 #     'ZZZ',
 #     'B',  # REFLECTOR
-#     ['ZZF', 'ZZN', 'ZZD', 'ZZI', 'ZZQ', 'ZZL', 'ZZK', 'ZZB',
-#         'ZZE', 'ZZJ', 'ZZM', 'ZZO'],  # SCRAMBLER SETTINGS
-#     ['RI',  'IG',  'GR',  'GN',  'NE',  'EB',  'BM',
-#         'MH',  'EU',  'US',  'SL',  'EO'],  # CONNECTIONS
-#     'R'  # INPUT LETTER
+#     ['ZZF', 'ZZD', 'ZZN', 'ZZI', 'ZZQ', 'ZZL', 'ZZK', 'ZZB',
+#         'ZZC', 'ZZE', 'ZZJ', 'ZZP'],  # SCRAMBLER SETTINGS
+#     ['IR',  'RG',  'GI',  'GN',  'NE',  'EB',  'BM',
+#         'MH',  'EF',  'EU',  'US',  'SV'],  # CONNECTIONS
+#     'I'  # INPUT LETTER
 # )
-
+# ------------------------------------------------------------------------
+# OUTPUT:
+# Starting letters: YYY
+# Possible steckers: BB DR EU FS GO HK IN JM VV
+# Possible ring settings: B M L - 2 13 12
+# ------------------------------------------------------------------------
+# COMMENTS:
+# Enigma output:
+# Simulator gave the same output
+##########################################################################
 # Reflector: B
-# Wheels:  II-III-I
-# Starting Letters: UYM
-# Plugged: IF JB QM RN SC VA
+# Wheels:  II III V
 # Crib: THEENIGMACODEWASTHE
-# Cipher crib: OQNBYVZTHUAJFBFZQAA
-# Decoded? YES
+# Cipher crib: JVACMMOAITFRLITZHTD
+# ------------------------------------------------------------------------
 # b = Bombe(
-#     'II',  # TOP / LEFT ROTOR
-#     'III',  # MIDDLE ROTOR
-#     'I',  # BOTTOM / RIGHT ROTOR
+#     'I',  # TOP / LEFT ROTOR
+#     'II',  # MIDDLE ROTOR
+#     'IV',  # BOTTOM / RIGHT ROTOR
 #     'ZZZ',
 #     'B',  # REFLECTOR
-#     ['ZZQ', 'ZZB', 'ZZR', 'ZZK', 'ZZA', 'ZZH', 'ZZS', 'ZZM',
-#         'ZZO', 'ZZC', 'ZZE', 'ZZD'],  # SCRAMBLER SETTINGS
-#     ['TQ',  'QH',  'HA',  'AO',  'OT',  'TM',  'AE',
-#         'EF',  'FA',  'EN',  'NY',  'EB'],  # CONNECTIONS
-#     'A'  # INPUT LETTER
+#     ['ZZA', 'ZZJ', 'ZZO', 'ZZQ', 'ZZB', 'ZZR', 'ZZC', 'ZZD',
+#         'ZZM', 'ZZS', 'ZZH', 'ZZI'],  # SCRAMBLER SETTINGS
+#     ['TJ',  'TC',  'TA',  'TH',  'HV',  'HT',  'EA',
+#         'EC',  'EL',  'ED',  'AM',  'AI'],  # CONNECTIONS
+#     'T'  # INPUT LETTER
 # )
-
-# Reflector: B
-# Wheels:  I-II-IV
-# Starting Letters: SIZ
-# Plugged: AF GS OC RH VM YW NK PX EL
-# Crib: TOBEORNOTTOBETHATISTHE
-# Cipher crib: LAVHDWGQCBNILYAIDCKLLT
-b = Bombe(
-    'I',  # TOP / LEFT ROTOR
-    'II',  # MIDDLE ROTOR
-    'IV',  # BOTTOM / RIGHT ROTOR
-    'ZZZ',
-    'B',  # REFLECTOR
-    ['ZZI', 'ZZR', ],  # SCRAMBLER SETTINGS
-    [],  # CONNECTIONS
-    'T'  # INPUT LETTER
-)
+# ------------------------------------------------------------------------
+# OUTPUT:
+# Starting letters: YYY
+# Possible steckers: AX CW DD EZ HH II JQ LP MV RT
+# Possible ring settings: E J L - 5 10 12
+# ------------------------------------------------------------------------
+# COMMENTS:
+# Enigma output: the efiyma cczz cxr fmy
+# Came from the lysator example ones, but it says no middle turnover.
+# Got most of the output, but it looks like middle turnover happens with
+# the menu settings that have been input.
+##########################################################################
 
 
 b.run()
