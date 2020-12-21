@@ -389,6 +389,7 @@ class Bombe():
 # Wheels: II-V-III
 # Crib: WETTERVORHERSAGE
 # Cipher crib: SNMKGGSTZZUGARLV
+# Decoded? NO
 # b = Bombe(
 #     'II',  # TOP / LEFT ROTOR
 #     'V',  # MIDDLE ROTOR
@@ -406,6 +407,7 @@ class Bombe():
 # Wheels:  II-III-V
 # Crib: THEGERMANSBELIEVED
 # Cipher crib: CMFRUIBIGUMBSGOSNY
+# Decoded? NO
 # b = Bombe(
 #     'II',  # TOP / LEFT ROTOR
 #     'III',  # MIDDLE ROTOR
@@ -425,6 +427,7 @@ class Bombe():
 # Plugged: IF JB QM RN SC VA
 # Crib: THEENIGMACODEWASTHE
 # Cipher crib: OQNBYVZTHUAJFBFZQAA
+# Decoded? YES
 # b = Bombe(
 #     'II',  # TOP / LEFT ROTOR
 #     'III',  # MIDDLE ROTOR
@@ -439,21 +442,19 @@ class Bombe():
 # )
 
 # Reflector: B
-# Wheels:  V-IV-III
+# Wheels:  I-II-IV
 # Starting Letters: SIZ
 # Plugged: AF GS OC RH VM YW NK PX EL
 # Crib: TOBEORNOTTOBETHATISTHE
-# Cipher crib: BYIKGHTEACAVXQXRIDWBUJ
+# Cipher crib: LAVHDWGQCBNILYAIDCKLLT
 b = Bombe(
-    'V',  # TOP / LEFT ROTOR
-    'IV',  # MIDDLE ROTOR
-    'III',  # BOTTOM / RIGHT ROTOR
+    'I',  # TOP / LEFT ROTOR
+    'II',  # MIDDLE ROTOR
+    'IV',  # BOTTOM / RIGHT ROTOR
     'ZZZ',
     'B',  # REFLECTOR
-    ['ZZQ', 'ZZC', 'ZZT', 'ZZI', 'ZZP', 'ZZF', 'ZZO', 'ZZM',
-        'ZZH', 'ZZK', 'ZZG', 'ZZR'],  # SCRAMBLER SETTINGS
-    ['TI',  'IB',  'BT',  'TA',  'AR',  'RH',  'HX',
-        'XE',  'EO',  'OA',  'TB',  'ID'],  # CONNECTIONS
+    ['ZZI', 'ZZR', ],  # SCRAMBLER SETTINGS
+    [],  # CONNECTIONS
     'T'  # INPUT LETTER
 )
 
