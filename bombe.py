@@ -386,14 +386,6 @@ class Bombe():
 #         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
 #     'E'  # INPUT LETTER
 # )
-# ------------------------------------------------------------------------
-# OUTPUT:
-# Starting letters: YWY
-# Possible steckers: AD ET FU GQ HM JL NV PZ RR SS
-# Possible ring settings: D M X - 4 13 24
-# ------------------------------------------------------------------------
-# COMMENTS:
-# Should  be DKX, middle rotor off by two
 ##########################################################################
 # Reflector: B
 # Wheels:  II III IV
@@ -414,18 +406,6 @@ class Bombe():
 #         'JH',  'TN',  'EF',  'AO',  'OW'],  # CONNECTIONS
 #     'H'  # INPUT LETTER
 # )
-# ------------------------------------------------------------------------
-# OUTPUT:
-# Starting letters: YYX
-# Possible steckers: AS BE DL FW GH JK MO NN TT UX
-# Possible ring settings: Q I O - 17 9 15
-# ------------------------------------------------------------------------
-# COMMENTS:
-# Enigma output (with proper ring settings): the envgma codj gdblrf
-# Online simulator shows the ring settings should be QIN, so the IV rotor
-# offset is messing something up.
-# Can infer that VI should be steckered
-# Middle rotor also turns apparently because goes to gibberish.
 ##########################################################################
 # Reflector: B
 # Wheels:  II III V
@@ -444,15 +424,6 @@ class Bombe():
 #         'MH',  'EF',  'EU',  'US',  'SV'],  # CONNECTIONS
 #     'I'  # INPUT LETTER
 # )
-# ------------------------------------------------------------------------
-# OUTPUT:
-# Starting letters: YYY
-# Possible steckers: BB DR EU FS GO HK IN JM VV
-# Possible ring settings: B M L - 2 13 12
-# ------------------------------------------------------------------------
-# COMMENTS:
-# Enigma output:
-# Simulator gave the same output
 ##########################################################################
 # Reflector: B
 # Wheels:  II III V
@@ -471,18 +442,7 @@ class Bombe():
 #         'EC',  'EL',  'ED',  'AM',  'AI'],  # CONNECTIONS
 #     'T'  # INPUT LETTER
 # )
-# ------------------------------------------------------------------------
-# OUTPUT:
-# Starting letters: YYY
-# Possible steckers: AX CW DD EZ HH II JQ LP MV RT
-# Possible ring settings: E J L - 5 10 12
-# ------------------------------------------------------------------------
-# COMMENTS:
-# Enigma output: the efiyma cczz cxr fmy
-# Came from the lysator example ones, but it says no middle turnover.
-# Got most of the output, but it looks like middle turnover happens with
-# the menu settings that have been input.
 ##########################################################################
 
 
-b.run()
+# b.run()
