@@ -1,6 +1,6 @@
 from typing import Text
 import PySimpleGUI as sg
-from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
+from PySimpleGUI.PySimpleGUI import Checkbox, RELIEF_GROOVE, TEXT_LOCATION_CENTER
 
 input_column = [
     [sg.Text(text='Input:')],
@@ -80,7 +80,11 @@ rotor_column = [
         sg.Frame('Middle Rotor', rotor_m, relief=RELIEF_GROOVE),
         sg.Frame('Right Rotor', rotor_r, relief=RELIEF_GROOVE)
     ],
-    [sg.Button('Encrypt')]
+    [
+        sg.Checkbox('Keyboard'),
+        sg.Checkbox('Monitor'),
+        sg.Button('Encrypt')
+    ]
 ]
 
 output_column = [
