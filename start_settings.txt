@@ -1,0 +1,8 @@
+Stepping Enabled:True
+Rotors:['III', 'I', 'V']
+Rotor Settings:['a', 'a', 'a']
+Ring Settings:['1', '1', '1']
+Reflector:B
+Plugboard:[]
+Plaintext:HELLO
+Ciphertext:APTQV
