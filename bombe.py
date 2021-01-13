@@ -2,8 +2,32 @@ from os import altsep
 from enigma import Enigma
 from indicator import Indicator
 from pprint import pprint
+import time
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
+class TimerError(Exception):
+    """A custom exception used to report errors in use of Timer class"""
+
+
+class Timer:
+    def __init__(self):
+        self._start_time = None
+        self.elapsed_time = 0
+
+    def start(self):
+        """Start a new timer"""
+        self._start_time = time.perf_counter()
+
+    def stop(self):
+        """Stop the timer, and report the elapsed time"""
+        if self._start_time is None:
+            raise TimerError(f"Timer is not running. Use .start() to start it")
+
+        elapsed_time = time.perf_counter() - self._start_time
+        self.elapsed_time += elapsed_time
+        print(f"Elapsed time: {self.elapsed_time:0.4f} seconds")
 
 
 class Bombe():
@@ -139,6 +163,8 @@ class Bombe():
         # pprint(self.menu)
 
     def run(self):
+        timer = Timer()
+        timer.start()
         stop = False
         iteration = 0
 
@@ -221,6 +247,7 @@ class Bombe():
 
                     # If the steckers are consistent and there was at least 1 consistent letter, then stop!
                     if (self.check_steckers(self.steckers) and valid_stop):
+                        timer.stop()
                         print(
                             '######################## STOP ########################')
 
@@ -245,6 +272,7 @@ class Bombe():
                         print(
                             '######################## STOP ########################')
                         input()
+                        timer.start()
 
             # Step scramblers
             for scrambler in self.scramblers:
@@ -254,6 +282,8 @@ class Bombe():
             self.indicator.step_rotors()
 
             iteration += 1
+
+        timer.stop()
 
     # Function that geneates steckers and checks if they are consistent
     def generate_steckers(self, path, outputs, consistent_letter):
@@ -387,62 +417,64 @@ class Bombe():
 #     'E'  # INPUT LETTER
 # )
 ##########################################################################
+# ------------------------------------------------------------------------
+# INPUT:
 # Reflector: B
-# Wheels:  II III IV
-# Starting Letters: IQK
-# Plugged: OM HG LD EB AS IV XU FW ZR KJ
-# Crib: THEENIGMACODEWASTHE
-# Cipher crib: UJLHTQBQUGAJFOJQHLV
+# Wheels: V I IV
+# Crib: TAETIGKEITSBERIQTVOM
+# Cipher crib: YMZAXOZBCWGZFIGIMWXQ
 # ------------------------------------------------------------------------
 # b = Bombe(
-#     'II',  # TOP / LEFT ROTOR
-#     'III',  # MIDDLE ROTOR
+#     'V',  # TOP / LEFT ROTOR
+#     'I',  # MIDDLE ROTOR
 #     'IV',  # BOTTOM / RIGHT ROTOR
 #     'ZZZ',
 #     'B',  # REFLECTOR
-#     ['ZZD', 'ZZC', 'ZZR', 'ZZQ', 'ZZA', 'ZZI', 'ZZO', 'ZZB',
-#         'ZZE', 'ZZM', 'ZZK', 'ZZN'],  # SCRAMBLER SETTINGS
-#     ['HE',  'EL',  'LH',  'HT',  'TU',  'UA',  'AJ',
-#         'JH',  'TN',  'EF',  'AO',  'OW'],  # CONNECTIONS
-#     'H'  # INPUT LETTER
+#     ['ZZD', 'ZZB', 'ZZQ', 'ZZT', 'ZZP', 'ZZO', 'ZZF', 'ZZS',
+#         'ZZE', 'ZZJ', 'ZZR', 'ZZI'],  # SCRAMBLER SETTINGS
+#     ['TA',  'AM',  'MT',  'MQ',  'QI',  'IG',  'GO',
+#         'OX',  'XI',  'TW',  'WV',  'IC'],  # CONNECTIONS
+#     'T'  # INPUT LETTER
 # )
 ##########################################################################
+# INPUT:
 # Reflector: B
-# Wheels:  II III V
-# Crib: THEGERMANSBELIEVED
-# Cipher crib: CMFRUIBIGUMBSGOSNY
+# Wheels: I III V
+# Crib: TAETIGSKEITSBERIQTFUERDEN
+# Cipher crib: PYZXKLLQFHELFTJAWURWBYZOW
 # ------------------------------------------------------------------------
 # b = Bombe(
-#     'II',  # TOP / LEFT ROTOR
+#     'I',  # TOP / LEFT ROTOR
 #     'III',  # MIDDLE ROTOR
 #     'V',  # BOTTOM / RIGHT ROTOR
 #     'ZZZ',
 #     'B',  # REFLECTOR
-#     ['ZZF', 'ZZD', 'ZZN', 'ZZI', 'ZZQ', 'ZZL', 'ZZK', 'ZZB',
-#         'ZZC', 'ZZE', 'ZZJ', 'ZZP'],  # SCRAMBLER SETTINGS
-#     ['IR',  'RG',  'GI',  'GN',  'NE',  'EB',  'BM',
-#         'MH',  'EF',  'EU',  'US',  'SV'],  # CONNECTIONS
-#     'I'  # INPUT LETTER
-# )
-##########################################################################
-# Reflector: B
-# Wheels:  II III V
-# Crib: THEENIGMACODEWASTHE
-# Cipher crib: JVACMMOAITFRLITZHTD
-# ------------------------------------------------------------------------
-# b = Bombe(
-#     'I',  # TOP / LEFT ROTOR
-#     'II',  # MIDDLE ROTOR
-#     'IV',  # BOTTOM / RIGHT ROTOR
-#     'ZZZ',
-#     'B',  # REFLECTOR
-#     ['ZZA', 'ZZJ', 'ZZO', 'ZZQ', 'ZZB', 'ZZR', 'ZZC', 'ZZD',
-#         'ZZM', 'ZZS', 'ZZH', 'ZZI'],  # SCRAMBLER SETTINGS
-#     ['TJ',  'TC',  'TA',  'TH',  'HV',  'HT',  'EA',
-#         'EC',  'EL',  'ED',  'AM',  'AI'],  # CONNECTIONS
+#     ['ZZN', 'ZZI', 'ZZS', 'ZZV', 'ZZB', 'ZZP', 'ZZE', 'ZZH',
+#         'ZZQ', 'ZZT', 'ZZR', 'ZZU'],  # SCRAMBLER SETTINGS
+#     ['TE',  'EF',  'FR',  'RY',  'YA',  'AI',  'IK',
+#         'KQ',  'QW',  'WU',  'UT',  'EB'],  # CONNECTIONS
 #     'T'  # INPUT LETTER
 # )
 ##########################################################################
+# INPUT:
+# Reflector: B
+# Wheels: IV I V
+# Crib: AUFSQWNBUNGSLUECKEX
+# Cipher crib: XHYGTXLUNFNHWYWQGVO
+# ------------------------------------------------------------------------
+b = Bombe(
+    'IV',  # TOP / LEFT ROTOR
+    'I',  # MIDDLE ROTOR
+    'V',  # BOTTOM / RIGHT ROTOR
+    'ZZZ',
+    'B',  # REFLECTOR
+    ['ZZI', 'ZZK', 'ZZD', 'ZZL', 'ZZB', 'ZZJ', 'ZZC', 'ZZN',
+        'ZZG', 'ZZM', 'ZZF', 'ZZS'],  # SCRAMBLER SETTINGS
+    ['UN',  'NG',  'GS',  'SH',  'HU',  'NF',  'FY',
+        'YU',  'NL',  'LW',  'WX',  'XO'],  # CONNECTIONS
+    'U'  # INPUT LETTER
+)
+##########################################################################
 
 
-# b.run()
+b.run()
