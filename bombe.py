@@ -462,17 +462,36 @@ class Bombe():
 # Crib: AUFSQWNBUNGSLUECKEX
 # Cipher crib: XHYGTXLUNFNHWYWQGVO
 # ------------------------------------------------------------------------
+# b = Bombe(
+#     'IV',  # TOP / LEFT ROTOR
+#     'I',  # MIDDLE ROTOR
+#     'V',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZI', 'ZZK', 'ZZD', 'ZZL', 'ZZB', 'ZZJ', 'ZZC', 'ZZN',
+#         'ZZG', 'ZZM', 'ZZF', 'ZZS'],  # SCRAMBLER SETTINGS
+#     ['UN',  'NG',  'GS',  'SH',  'HU',  'NF',  'FY',
+#         'YU',  'NL',  'LW',  'WX',  'XO'],  # CONNECTIONS
+#     'U'  # INPUT LETTER
+# )
+##########################################################################
+# INPUT:
+# Reflector: A
+# Wheels: II I III
+# Crib: SUEDAUSGANGBAERWALDE
+# Cipher crib: VRMMEVOUYFZSLRHDRRXF
+# ------------------------------------------------------------------------
 b = Bombe(
-    'IV',  # TOP / LEFT ROTOR
+    'II',  # TOP / LEFT ROTOR
     'I',  # MIDDLE ROTOR
-    'V',  # BOTTOM / RIGHT ROTOR
+    'III',  # BOTTOM / RIGHT ROTOR
     'ZZZ',
-    'B',  # REFLECTOR
-    ['ZZI', 'ZZK', 'ZZD', 'ZZL', 'ZZB', 'ZZJ', 'ZZC', 'ZZN',
-        'ZZG', 'ZZM', 'ZZF', 'ZZS'],  # SCRAMBLER SETTINGS
-    ['UN',  'NG',  'GS',  'SH',  'HU',  'NF',  'FY',
-        'YU',  'NL',  'LW',  'WX',  'XO'],  # CONNECTIONS
-    'U'  # INPUT LETTER
+    'A',  # REFLECTOR
+    ['ZZM', 'ZZE', 'ZZN', 'ZZR', 'ZZQ', 'ZZB', 'ZZF', 'ZZA',
+        'ZZL', 'ZZH', 'ZZK', 'ZZC'],  # SCRAMBLER SETTINGS
+    ['LA',  'AE',  'ER',  'RL',  'RA',  'RU',  'UV',
+        'VS',  'SB',  'UG',  'GZ',  'EM'],  # CONNECTIONS
+    'R'  # INPUT LETTER
 )
 ##########################################################################
 
