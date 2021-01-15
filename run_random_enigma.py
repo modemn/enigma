@@ -2,6 +2,7 @@ from enigma import ALPHABET, Enigma
 import reflector
 import rotor
 import random
+from menu_generator import MenuGenerator
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -29,12 +30,12 @@ steckers = [''.join(a_copy[i*2: (i+1)*2])
 
 enigma = Enigma(
     False,
-    True,
+    False,
     True,
     rotors,
     starting_letters,
     ring_settings,
-    reflector,
+    'B',
     steckers
 )
 
@@ -60,3 +61,5 @@ print('Plaintext:', plain)
 print('Ciphertext:', cipher)
 print('*************************')
 print()
+
+mg = MenuGenerator(plain, cipher, 'ZZZ')

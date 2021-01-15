@@ -93,4 +93,22 @@
 #         'VS',  'SB',  'UG',  'GZ',  'EM'],  # CONNECTIONS
 #     'R'  # INPUT LETTER
 # )
-##########################################################################
+#6########################################################################
+# INPUT:
+# Reflector: B
+# Wheels: I IV II
+# Crib: WETTERVORHERSAGE
+# Cipher crib: BUPXBMCTBSQSQHAP
+# ------------------------------------------------------------------------
+# b = Bombe(
+#     'I',  # TOP / LEFT ROTOR
+#     'IV',  # MIDDLE ROTOR
+#     'II',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZE', 'ZZI', 'ZZL', 'ZZM', 'ZZK', 'ZZP', 'ZZC', 'ZZH',
+#         'ZZD', 'ZZJ', 'ZZN', 'ZZO'],  # SCRAMBLER SETTINGS
+#     ['EB',  'BR',  'RS',  'SQ',  'QE',  'EP',
+#         'PT',  'TO',  'TX',  'SH',  'HA',  'AG'],  # CONNECTIONS
+#     'E'  # INPUT LETTER
+# )

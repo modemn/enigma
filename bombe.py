@@ -397,4 +397,17 @@ class Bombe():
         return to_print
 
 
-# b.run()
+b = Bombe(
+    'I',  # TOP / LEFT ROTOR
+    'III',  # MIDDLE ROTOR
+    'IV',  # BOTTOM / RIGHT ROTOR
+    'ZZZ',
+    'B',  # REFLECTOR
+    ['ZZP', 'ZZN', 'ZZL', 'ZZF', 'ZZE', 'ZZK', 'ZZA', 'ZZI',
+        'ZZC', 'ZZD', 'ZZG', 'ZZB'],  # SCRAMBLER SETTINGS
+    ['EA',  'AL',  'LR',  'RI',  'IE',  'EH',  'HW',
+        'RQ',  'QT',  'TR',  'LV',  'EX'],  # CONNECTIONS
+    'E'  # INPUT LETTER
+)
+
+b.run()
