@@ -1,6 +1,4 @@
 from enigma import ALPHABET, Enigma
-import reflector
-import rotor
 import random
 from menu_generator import MenuGenerator
 

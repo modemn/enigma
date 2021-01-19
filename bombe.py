@@ -213,6 +213,7 @@ class Bombe():
             # Iterate through the paths and save the closures
             closures = []
             for path_string in dfs_tree_paths.keys():
+                # TODO: I can change the line below to if (len(set(path_string)) != len(path_string)):
                 if not (len(set(path_string)) == len(path_string)):
                     closures.append(path_string)
 
