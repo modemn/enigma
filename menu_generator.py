@@ -47,17 +47,17 @@ class MenuGenerator:
         plt.show()
 
 
-# print('Plain crib:')
-# plain_crib = input().replace(" ", "").upper()
+print('Plain crib:')
+plain_crib = input().replace(" ", "").upper()
 
-# print('Cipher crib:')
-# cipher_crib = input().replace(" ", "").upper()
+print('Cipher crib:')
+cipher_crib = input().replace(" ", "").upper()
 
-# print('Starting letters:')
-# starting_letters = input().replace(" ", "").upper()
+print('Starting letters:')
+starting_letters = input().replace(" ", "").upper()
 
-# assert len(starting_letters) == 3, 'There should be 3 starting letters!'
-# assert len(plain_crib) == len(
-#     cipher_crib), 'The cipher and plain cribs should be of the same length'
+assert len(starting_letters) == 3, 'There should be 3 starting letters!'
+assert len(plain_crib) == len(
+    cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-# mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
