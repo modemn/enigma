@@ -3,7 +3,7 @@ import random
 import networkx as nx
 import csv
 import matplotlib.pyplot as plt
-from pprint import pprint
+import numpy as np
 from enigma import Enigma
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -69,8 +69,9 @@ def get_closures(graph):
 
 max_crib_length = int(sys.argv[1])
 num_iterations = int(sys.argv[2])
+bar_offset = 0
 
-for crib_length in range(5, max_crib_length+1):
+for crib_length in range(10, max_crib_length+1):
     enigma = get_random_enigma(crib_length)
 
     encrypted_lorem = enigma.encrypt(LOREM)
@@ -108,15 +109,16 @@ for crib_length in range(5, max_crib_length+1):
     closure_lengths = dict((x, closure_lengths.count(x))
                            for x in set(closure_lengths))
 
-    x_data = list(closure_lengths.keys())
+    x_data = np.array(list(closure_lengths.keys()))
     y_data = list(closure_lengths.values())
     y_data = [y/num_iterations for y in y_data]
 
-    plt.bar(x_data, y_data, label='Crib length {}'.format(
-        str(crib_length)))
-    plt.xticks(x_data, tuple(x_data))
+    plt.bar(x_data + bar_offset, y_data, label='Crib length {}'.format(
+        str(crib_length)), width=0.05)
 
-    plt.legend()
-    plt.xlabel('Number of closures in the menu')
-    plt.ylabel('Normalized Rate of occurrance')
-    plt.show()
+    bar_offset += 0.05
+
+plt.legend()
+plt.xlabel('Number of closures in the menu')
+plt.ylabel('Normalized Rate of occurrance')
+plt.show()
