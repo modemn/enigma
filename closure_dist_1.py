@@ -83,7 +83,7 @@ def get_closures(graph):
 max_crib_length = int(sys.argv[1])
 num_repeats = int(sys.argv[2])
 
-for crib_length in range(5, max_crib_length+1):
+for crib_length in range(10, max_crib_length+1):
     enigma = get_random_enigma(num_repeats, crib_length)
 
     encrypted_lorem = enigma.encrypt(LOREM)
@@ -130,7 +130,7 @@ for crib_length in range(5, max_crib_length+1):
         closures = get_closures(menu)
         closure_lengths.append(len(closures))
 
-        # pprint(closures)
+        pprint(closures)
 
         with open('{}_{}.csv'.format(num_repeats, crib_length), 'a', newline='') as file:
             wr = csv.writer(file)
