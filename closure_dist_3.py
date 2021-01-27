@@ -1,7 +1,7 @@
 import sys
 import random
 import networkx as nx
-import csv
+# import csv
 import matplotlib.pyplot as plt
 import numpy as np
 from enigma import Enigma
@@ -32,23 +32,23 @@ def get_random_enigma(crib_length):
         steckers
     )
 
-    with open('criblen_{}.csv'.format(crib_length), 'w', newline='') as file:
-        wr = csv.writer(file)
-        row = [
-            enigma.l_rotor.name,
-            enigma.m_rotor.name,
-            enigma.r_rotor.name,
-            enigma.l_rotor.current_letter_setting(),
-            enigma.m_rotor.current_letter_setting(),
-            enigma.r_rotor.current_letter_setting(),
-            enigma.l_rotor.ring_setting,
-            enigma.m_rotor.ring_setting,
-            enigma.r_rotor.ring_setting,
-            enigma.reflector.name,
-            ', '.join(steckers)
-        ]
+    # with open('criblen_{}.csv'.format(crib_length), 'w', newline='') as file:
+    #     wr = csv.writer(file)
+    #     row = [
+    #         enigma.l_rotor.name,
+    #         enigma.m_rotor.name,
+    #         enigma.r_rotor.name,
+    #         enigma.l_rotor.current_letter_setting(),
+    #         enigma.m_rotor.current_letter_setting(),
+    #         enigma.r_rotor.current_letter_setting(),
+    #         enigma.l_rotor.ring_setting,
+    #         enigma.m_rotor.ring_setting,
+    #         enigma.r_rotor.ring_setting,
+    #         enigma.reflector.name,
+    #         ', '.join(steckers)
+    #     ]
 
-        wr.writerow(row)
+    #     wr.writerow(row)
 
     return enigma
 
@@ -69,10 +69,10 @@ def get_closures(graph):
 
 max_crib_length = int(sys.argv[1])
 num_iterations = int(sys.argv[2])
-bar_offset = 0
-bar_width = 0.1
 
-for crib_length in range(5, max_crib_length+1, 5):
+x_data = []
+y_data = []
+for crib_length in range(5, max_crib_length+1):
     enigma = get_random_enigma(crib_length)
 
     encrypted_lorem = enigma.encrypt(LOREM)
@@ -98,29 +98,24 @@ for crib_length in range(5, max_crib_length+1, 5):
         closures = get_closures(menu)
         closure_lengths.append(len(closures))
 
-        with open('criblen_{}.csv'.format(crib_length), 'a', newline='') as file:
-            wr = csv.writer(file)
-            row = [plain_crib, cipher_crib, len(closures)]
-            wr.writerow(row)
+    #     with open('criblen_{}.csv'.format(crib_length), 'a', newline='') as file:
+    #         wr = csv.writer(file)
+    #         row = [plain_crib, cipher_crib, len(closures)]
+    #         wr.writerow(row)
 
-    with open('criblen_{}.csv'.format(crib_length), 'a', newline='') as file:
-        wr = csv.writer(file)
-        wr.writerow(closure_lengths)
+    # with open('criblen_{}.csv'.format(crib_length), 'a', newline='') as file:
+    #     wr = csv.writer(file)
+    #     wr.writerow(closure_lengths)
 
     closure_lengths = dict((x, closure_lengths.count(x))
                            for x in set(closure_lengths))
 
-    x_data = np.array(list(closure_lengths.keys()))
-    y_data = list(closure_lengths.values())
-    y_data = [y/num_iterations for y in y_data]
+    x_data.append(crib_length)
+    # y_data.append(sum(list(closure_lengths.values())[1:]))
+    y_data.append(closure_lengths[0])
 
-    plt.bar(x_data + bar_offset, y_data, label='Crib length {}'.format(
-        str(crib_length)), width=bar_width)
 
-    bar_offset += bar_width
-
-plt.legend()
-plt.xlabel('Number of closures in the menu')
-plt.ylabel('Normalized Rate of occurrance')
-plt.xticks(np.arange(max(x_data)+1) + bar_width, np.arange(max(x_data)+1))
+plt.plot(x_data, y_data)
+plt.xlabel('Length of Crib')
+plt.ylabel('Rate of exactly no closures occuring')
 plt.show()
