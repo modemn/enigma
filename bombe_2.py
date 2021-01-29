@@ -1,9 +1,9 @@
-from os import altsep
+import sys
 from enigma import Enigma
 from indicator import Indicator
+from menu_generator import MenuGenerator
 from pprint import pprint
 import time
-import networkx as nx
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -193,108 +193,100 @@ class Bombe():
             print(bottom_row)
             print()
 
-            # Find all the closures in the menu
-            closures_raw = self.find_closures()
+            # Intialize dictionary keeping track of visited nodes
+            visited = {}
+            for i in list(self.menu.keys()):
+                visited[i] = False
 
-            closures = scramble_through_closures
+            # Initialize dictionary keeping track of the paths and their outputs
+            dfs_tree_paths = {self.input: [ALPHABET]}
 
+            # DFS with the input as the source node
+            self.dfs(
+                self.input,  # current node
+                0,  # parent of this node, initialised to 0 since this is the source
+                visited,  # visited list
+                str(self.input),  # path so far, initialized to just the input
+                dfs_tree_paths,  # dictionary of all paths and all outputs
+                ALPHABET  # initial string to scramble
+            )
+
+            # Iterate through the paths and save the closures
+            closures = []
+            for path_string in dfs_tree_paths.keys():
+                if (len(set(path_string)) != len(path_string)):
+                    closures.append(path_string)
+
+            valid_stop = True
             consistent_letters = []
 
-        #     # Iterate through the closures
-        #     for closure in closures:
+            # Iterate through the closures
+            for closure in closures:
 
-        #         # Find all letters that stay the same after traversing the loop of scramblers
-        #         for i in range(26):
-        #             if(ALPHABET[i] == dfs_tree_paths[closure][-1][i]):
-        #                 consistent_letters.append(ALPHABET[i])
+                # Find all letters that stay the same after traversing the loop of scramblers
+                for i in range(26):
+                    if(ALPHABET[i] == dfs_tree_paths[closure][-1][i]):
+                        consistent_letters.append(ALPHABET[i])
 
-        #         # If there are no consistent letters, then invalid stop
-        #         if (len(consistent_letters) < 1):
-        #             valid_stop = False
-        #             break
+                # If there are no consistent letters, then invalid stop
+                if (len(consistent_letters) < 1):
+                    valid_stop = False
+                    break
 
-        #         # Check whether any of the consistent letters found give a valid steckering
-        #         for cl in consistent_letters:
-        #             # Reset all steckers
-        #             for letter in ALPHABET:
-        #                 self.steckers[letter] = ''
+                # Check whether any of the consistent letters found give a valid steckering
+                for cl in consistent_letters:
+                    # Reset all steckers
+                    for letter in ALPHABET:
+                        self.steckers[letter] = ''
 
-        #             self.generate_steckers(
-        #                 closure, dfs_tree_paths[closure], cl)
+                    self.generate_steckers(
+                        closure, dfs_tree_paths[closure], cl)
 
-        #             # Add the steckers deduced from non-closure paths
-        #             for path in dfs_tree_paths:
-        #                 self.generate_steckers(path, dfs_tree_paths[path], cl)
+                    # Add the steckers deduced from non-closure paths
+                    for path in dfs_tree_paths:
+                        self.generate_steckers(path, dfs_tree_paths[path], cl)
 
-        #             # If the steckers are consistent and there was at least 1 consistent letter, then stop!
-        #             if (self.check_steckers(self.steckers) and valid_stop):
-        #                 timer.stop()
-        #                 print(
-        #                     '######################## STOP ########################')
+                    # If the steckers are consistent and there was at least 1 consistent letter, then stop!
+                    if (self.check_steckers(self.steckers) and valid_stop):
+                        timer.stop()
+                        print(
+                            '######################## STOP ########################')
 
-        #                 print('Outputs through closures:')
-        #                 for closure in closures:
-        #                     pprint(dfs_tree_paths[closure])
-        #                     print()
-        #                 print('Consistent letters:', consistent_letters)
-        #                 print()
+                        print('Outputs through closures:')
+                        for closure in closures:
+                            pprint(dfs_tree_paths[closure])
+                            print()
+                        print('Consistent letters:', consistent_letters)
+                        print()
 
-        #                 print()
-        #                 print('Rotors:', self.l_rotor,
-        #                       self.m_rotor, self.r_rotor)
-        #                 print()
-        #                 print('Starting letters:', self.starting_letters)
-        #                 print()
-        #                 print('Possible steckers:', self.print_steckers())
-        #                 print()
-        #                 print('Possible ring settings:',
-        #                       self.print_ring_settings())
-        #                 print()
-        #                 print(
-        #                     '######################## STOP ########################')
-        #                 input()
-        #                 timer.start()
+                        print()
+                        print('Rotors:', self.l_rotor,
+                              self.m_rotor, self.r_rotor)
+                        print()
+                        print('Starting letters:', self.starting_letters)
+                        print()
+                        print('Possible steckers:', self.print_steckers())
+                        print()
+                        print('Possible ring settings:',
+                              self.print_ring_settings())
+                        print()
+                        print(
+                            '######################## STOP ########################')
+                        input()
+                        timer.start()
 
-        #     # Step scramblers
-        #     for scrambler in self.scramblers:
-        #         scrambler.step_rotors(True)
+            # Step scramblers
+            for scrambler in self.scramblers:
+                scrambler.step_rotors(True)
 
-        #     # Step indicator
-        #     self.indicator.step_rotors()
+            # Step indicator
+            self.indicator.step_rotors()
 
-        #     iteration += 1
+            iteration += 1
 
-        # timer.stop()
-
-    # Function thats finds all the closures within the graph
-    def find_closures(self):
-        # Go through the menu and construct the graph in a format that networkx can read
-        graph = {}
-        for node in self.menu:
-            print('node', node)
-            for neighbour in self.menu[node]:
-                print('neighbour', neighbour[0])
-                try:
-                    graph[node].append(neighbour[0])
-                except:
-                    graph[node] = [neighbour[0]]
-
-        closures = []
-        g = nx.DiGraph(graph)
-
-        # Obtain the closures in the menu
-        res = list(nx.simple_cycles(g))
-
-        # Remove the closures of length 2 and duplicate closures
-        for cl in res:
-            if len(cl) > 2:
-                if (set(''.join(cl)) not in [set(x) for x in closures]):
-                    closures.append(cl)
-
-        return closures
+        timer.stop()
 
     # Function that geneates steckers and checks if they are consistent
-
     def generate_steckers(self, path, outputs, consistent_letter):
         # Construct the steckering
         for i in range(len(outputs)):
@@ -308,6 +300,7 @@ class Bombe():
                 consistent_letter)]] += path[i % len(self.scramblers)]
 
     # Function that check if given steckers have no contradictions
+
     def check_steckers(self, steckers):
         # Check if there are any steckers at all
         values = ''.join(steckers.values())
@@ -330,6 +323,52 @@ class Bombe():
         # so no need to save
         else:
             return False
+
+    # Recursive function that creates tree paths using DFS
+    def dfs(self, v, parent, visited, path, dfs_tree_paths, to_scramble):
+
+        # Record that node v has been visited
+        visited[v] = True
+
+        # Iterate through the neigbhours of v
+        for i in self.menu[v]:
+
+            # If the node hasn't been visited before
+            if not visited[i[0]]:
+
+                # Extend the path with the neighbour i
+                extended_path = path+str(i[0])
+
+                # Scramble the input alphabet
+                scrambler_output = self.scramble(i[1], to_scramble)
+
+                # Append it on to the output alphabets from the path
+                path_outputs = dfs_tree_paths[path] + [scrambler_output]
+
+                # Insert it into the dictionary that holds all the paths
+                # and their outputs
+                dfs_tree_paths[extended_path] = path_outputs
+
+                # Recurse with i as the source node and the extended path
+                self.dfs(i[0], v, visited, extended_path,
+                         dfs_tree_paths, scrambler_output)
+
+            # If the node has been visited and it was not this
+            # node's parent, then a loop is found, scramble one last time
+            elif (visited[i[0]] and i[0] != parent):
+                # print('Found a loop!')
+                # Extend the path with the neighbour i
+                extended_path = path+str(i[0])
+
+                # Scramble the input alphabet
+                scrambler_output = self.scramble(i[1], to_scramble)
+
+                # Append it on to the output alphabets from the path
+                path_outputs = dfs_tree_paths[path] + [scrambler_output]
+
+                # Insert it into the dictionary that holds all the paths
+                # and their outputs
+                dfs_tree_paths[extended_path] = path_outputs
 
     # Function that returns the encryption of the input
     # through a scrambler whose starting letters are given
@@ -359,17 +398,73 @@ class Bombe():
         return to_print
 
 
+# b = Bombe(
+#     'II',  # TOP / LEFT ROTOR
+#     'V',  # MIDDLE ROTOR
+#     'III',  # BOTTOM / RIGHT ROTOR
+#     'ZZZ',
+#     'B',  # REFLECTOR
+#     ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
+#         'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
+#     ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
+#         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
+#     'E'  # INPUT LETTER
+# )
+
+top_rotor = sys.argv[1]
+middle_rotor = sys.argv[2]
+bottom_rotor = sys.argv[3]
+
+assert top_rotor in ['I', 'II', 'III', 'IV',
+                     'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
+assert middle_rotor in ['I', 'II', 'III', 'IV',
+                        'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
+assert bottom_rotor in ['I', 'II', 'III', 'IV',
+                        'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
+
+reflector = sys.argv[4].upper()
+
+assert reflector in [
+    'A', 'B', 'C'], "That reflector does not exist or currently isnt available as an option, please pick from {'A', 'B', C}"
+
+plain_crib = sys.argv[5].replace(' ', '').upper()
+cipher_crib = sys.argv[6].replace(' ', '').upper()
+
+assert len(plain_crib) == len(
+    cipher_crib), 'The cipher and plain cribs should be of the same length'
+
+starting_letters = sys.argv[7].upper()
+
+assert len(starting_letters) == 3, 'There should be 3 starting letters!'
+
+input_letter = sys.argv[8].upper()
+
+assert len(input_letter) == 1, "Only provide 1 input letter"
+assert input_letter in ALPHABET, "Please provide 1 letter from the standard english alphabet"
+
+mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+
+settings, connections = mg.get_bombe_settings()
+
+print('******************BOMBE******************')
+print('Running the Bombe with the following settings:')
+print('Rotors:', top_rotor, middle_rotor, bottom_rotor)
+print('Starting Letters:', starting_letters)
+pprint(list(zip(settings, connections)))
+print('*****************************************')
+print()
+print("Press return to start the Bombe")
+input()
+
 b = Bombe(
-    'II',  # TOP / LEFT ROTOR
-    'V',  # MIDDLE ROTOR
-    'III',  # BOTTOM / RIGHT ROTOR
-    'ZZZ',
-    'B',  # REFLECTOR
-    ['ZZK', 'ZZE', 'ZZF', 'ZZN', 'ZZM', 'ZZG',
-        'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
-    ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
-        'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
-    'E'  # INPUT LETTER
+    top_rotor,
+    middle_rotor,
+    bottom_rotor,
+    starting_letters,
+    reflector,
+    settings,
+    connections,
+    input_letter
 )
 
 b.run()
