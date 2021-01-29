@@ -37,6 +37,7 @@ class MenuGenerator:
 
         self.menu.add_edges_from(connections)
 
+    def draw_menu(self):
         pos = nx.planar_layout(self.menu)
 
         plt.figure()
@@ -49,7 +50,7 @@ class MenuGenerator:
             self.menu, pos, edge_labels=self.edge_labels, font_color='black')
 
         plt.axis('off')
-        # plt.show()
+        plt.show()
 
     def get_closures(self, graph):
         closures = []
@@ -99,34 +100,37 @@ class MenuGenerator:
         closures = [x for x in closures if len(x) <= 11]
         closures.reverse()
 
-        # Check for and remove disconnected menus
-        # Iterate through the closures
-        connected_closures = {}
-        for cl in closures:
-            connected_closures[cl] = []
-        for i in range(len(closures)):
-            # Check for a path to all other closures
-            for j in range(i+1, len(closures)):
-                # If there is a path, then move on to the next closure
-                if (nx.has_path(self.menu, closures[i][0], closures[j][0])):
-                    connected_closures[closures[i]].append(closures[j])
-                    connected_closures[closures[j]].append(closures[i])
-
-        # Keep only the connected closures
-        closures = [v[0] for v in connected_closures.items() if len(v[1])]
-
         self.add_settings(closures[0]+closures[0][0])
 
-        for neighbour in connected_closures[closures[0]]:
-            # Find shortest path to the neighbouring clousre
-            path, path_len = self.shortest_path_between_closures(
-                closures[0], neighbour)
+        # Check for and remove disconnected closures if there are more than one closures
+        if (len(closures) > 1):
+            # Initialise dictionary
+            connected_closures = {}
+            for cl in closures:
+                connected_closures[cl] = []
+            # Iterate through the closures
+            for i in range(len(closures)):
+                # Check for a path to all other closures
+                for j in range(i+1, len(closures)):
+                    # If there is a path, save it in the dictionary
+                    if (nx.has_path(self.menu, closures[i][0], closures[j][0])):
+                        connected_closures[closures[i]].append(closures[j])
+                        connected_closures[closures[j]].append(closures[i])
 
-            # If adding the path to the clousre and all its edges to the
-            # connections doesn't go over our limit of 12, then add it
-            if (len(self.scrambler_connections) + len(neighbour) + path_len < 12):
-                self.add_settings(''.join(path))
-                self.add_settings(neighbour+neighbour[0])
+            # Keep only the connected closures ie keys in the dictionary with a non-zero length value
+            closures = [v[0] for v in connected_closures.items() if len(v[1])]
+
+            # Iterate through the closures connected to the first closure
+            for neighbour in connected_closures[closures[0]]:
+                # Find shortest path to the neighbouring clousre
+                path, path_len = self.shortest_path_between_closures(
+                    closures[0], neighbour)
+
+                # If adding the path to the clousre and all its edges to the
+                # connections doesn't go over our limit of 12, then add it
+                if (len(self.scrambler_connections) + len(neighbour) + path_len < 12):
+                    self.add_settings(''.join(path))
+                    self.add_settings(neighbour+neighbour[0])
 
         # If there is still space for more scramblers then add on tails
         while (len(self.scrambler_connections) < 12):
@@ -149,10 +153,12 @@ class MenuGenerator:
 
 # print('Plain crib:')
 # plain_crib = input().replace(" ", "").upper()
+# plain_crib = 'WETTERVORHERSAGE'
 plain_crib = 'TAETIGKEITSBERIQTVOM'
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
+# cipher_crib = 'SNMKGGSTZZUGARLV'
 cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
 
 # print('Starting letters:')
@@ -166,3 +172,4 @@ assert len(plain_crib) == len(
 mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
 settings, connections = mg.get_bombe_settings()
 pprint(list(zip(settings, connections)))
+mg.draw_menu()
