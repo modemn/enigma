@@ -289,10 +289,11 @@ class Bombe():
                 wr.writerow([f'End time: {end_time:0.4f}'])
         else:
             print(f'Total time: {end_time:0.04f} seconds')
+            return end_time
 
     def auto_run(self):
         self.auto_running = True
-        self.run()
+        return self.run()
 
     # Function that geneates steckers and checks if they are consistent
     def generate_steckers(self, path, outputs, consistent_letter):

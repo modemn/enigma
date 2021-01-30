@@ -155,7 +155,7 @@ class MenuGenerator:
                             added = True
         else:
             # TODO: Need to implement adding settings for when there are no closures in the menu
-            return [], []
+            return [], [], '!', -1
 
         joined_connections = ''.join(self.scrambler_connections)
         settings_degrees = dict((x, joined_connections.count(x))
@@ -169,21 +169,23 @@ class MenuGenerator:
 # plain_crib = input().replace(" ", "").upper()
 # plain_crib = 'WETTERVORHERSAGE'
 # plain_crib = 'TAETIGKEITSBERIQTVOM'
+plain_crib = 'ORSITAMETC'
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'
 # cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
+cipher_crib = 'YITCWTUWRT'
 
 # print('Starting letters:')
 # starting_letters = input().replace(" ", "").upper()
-# starting_letters = 'ZZZ'
+starting_letters = 'ZZZ'
 
 # assert len(starting_letters) == 3, 'There should be 3 starting letters!'
 # assert len(plain_crib) == len(
 #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-# mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-# settings, connections = mg.get_bombe_settings()
-# pprint(list(zip(settings, connections)))
+mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
 # mg.draw_menu()
+settings, connections, _, _ = mg.get_bombe_settings()
+pprint(list(zip(settings, connections)))

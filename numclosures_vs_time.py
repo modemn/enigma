@@ -3,11 +3,14 @@ from bombe_2 import Bombe
 from enigma import Enigma
 import random
 import sys
+import csv
 import networkx as nx
+import matplotlib.pyplot as plt
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-PLAINTEXT = 'INVORAUSSICHTDASSICHUBERKURZEMMITDERSCHWERSTENFORDERUNGANDIEMENSCHHEITHERANTRETENMUSSDIEJEANSIEGESTELLTWURDESCHEINTESMIRUNERLASSLICHZUSAGENWERICHBINIMGRUNDEDURFTEMANSWISSENDENNICHHABEMICHNICHTUNBEZEUGTGELASSENDASMISSVERHALTNISSABERZWISCHENDERGROSSEMEINERAUFGABEUNDDERKLEINHEITMEINERZEITGENOSSENISTDARINZUMAUSDRUCKGEKOMMENDASSMANMICHWEDERGEHORTNOCHAUCHNURGESEHNHATICHLEBEAUFMEINENEIGNENCREDITHINESISTVIELLEICHTBLOSSEINVORURTHEILDASSICHLEBEICHBRAUCHENURIRGENDEINENGEBILDETENZUSPRECHENDERIMSOMMERINSOBERENGADINKOMMTUMMICHZUUBERZEUGENDASSICHNICHTLEBEUNTERDIESENUMSTANDENGIEBTESEINEPFLICHTGEGENDIEIMGRUNDEMEINEGEWOHNHEITNOCHMEHRDERSTOLZMEINERINSTINKTEREVOLTIRTNAMLICHZUSAGENHORTMICHDENNICHBINDERUNDDERVERWECHSELTMICHVORALLEMNICHT'
+# PLAINTEXT = 'INVORAUSSICHTDASSICHUBERKURZEMMITDERSCHWERSTENFORDERUNGANDIEMENSCHHEITHERANTRETENMUSSDIEJEANSIEGESTELLTWURDESCHEINTESMIRUNERLASSLICHZUSAGENWERICHBINIMGRUNDEDURFTEMANSWISSENDENNICHHABEMICHNICHTUNBEZEUGTGELASSENDASMISSVERHALTNISSABERZWISCHENDERGROSSEMEINERAUFGABEUNDDERKLEINHEITMEINERZEITGENOSSENISTDARINZUMAUSDRUCKGEKOMMENDASSMANMICHWEDERGEHORTNOCHAUCHNURGESEHNHATICHLEBEAUFMEINENEIGNENCREDITHINESISTVIELLEICHTBLOSSEINVORURTHEILDASSICHLEBEICHBRAUCHENURIRGENDEINENGEBILDETENZUSPRECHENDERIMSOMMERINSOBERENGADINKOMMTUMMICHZUUBERZEUGENDASSICHNICHTLEBEUNTERDIESENUMSTANDENGIEBTESEINEPFLICHTGEGENDIEIMGRUNDEMEINEGEWOHNHEITNOCHMEHRDERSTOLZMEINERINSTINKTEREVOLTIRTNAMLICHZUSAGENHORTMICHDENNICHBINDERUNDDERVERWECHSELTMICHVORALLEMNICHT'
+PLAINTEXT = 'LOREMIPSUMDOLORSITAMETCONSECTETURADIPISCINGELITSEDDOEIUSMODTEMPORINCIDIDUNTUTLABOREETDOLOREMAGNAALIQUAUTENIMADMINIMVENIAMQUISNOSTRUDEXERCITATIONULLAMCOLABORISNISIUTALIQUIPEXEACOMMODOCONSEQUATDUISAUTEIRUREDOLORINREPREHENDERITINVOLUPTATEVELITESSECILLUMDOLOREEUFUGIATNULLAPARIATUREXCEPTEURSINTOCCAECATCUPIDATATNONPROIDENTSUNTINCULPAQUIOFFICIADESERUNTMOLLITANIMIDESTLABORUM'
 
 
 def get_random_enigma():
@@ -95,7 +98,10 @@ def make_menu(plain_crib, cipher_crib):
     return menu
 
 
-crib_len = sys.argv[1]
+# crib_len = int(sys.argv[1])
+crib_len = 10
+
+data = {}
 
 
 random_enigma = get_random_enigma()
@@ -104,20 +110,68 @@ ciphertext = random_enigma.encrypt(PLAINTEXT)
 for i in range(len(PLAINTEXT)):
     plain_crib = PLAINTEXT[i:i+crib_len]
     cipher_crib = ciphertext[i:i+crib_len]
+    print(plain_crib, cipher_crib)
+
+    print('Making menu...')
     menu = make_menu(plain_crib, cipher_crib)
+
+    print('Getting closures...')
     closures = get_closures(menu)
 
-    if len(closures) == 1:
-        mg = MenuGenerator(plain_crib, cipher_crib, 'ZZZ')
-        settings, connections, input_letter, _ = mg.get_bombe_settings()
+    print('Getting settings...')
+    mg = MenuGenerator(plain_crib, cipher_crib, 'ZZZ')
+    settings, connections, input_letter, num_closures = mg.get_bombe_settings()
+
+    if (num_closures > 0):
+        print('Bombe time...')
+
+        top_rotor = random_enigma.l_rotor.name
+        middle_rotor = random_enigma.m_rotor.name
+        bottom_rotor = random_enigma.r_rotor.name
+        reflector = random_enigma.reflector.name
+
+        with open('bombe_output.csv', 'w', newline='') as file:
+            wr = csv.writer(file)
+            wr.writerow([
+                top_rotor,
+                middle_rotor,
+                bottom_rotor,
+                reflector,
+                plain_crib,
+                cipher_crib,
+                'ZZZ',
+                input_letter
+            ])
+            wr.writerow([])
+            wr.writerows(list(zip(settings, connections)))
+            wr.writerow([])
+            wr.writerow(
+                [f'Number of closures in the settings: {num_closures}'])
+            wr.writerow([])
 
         bombe = Bombe(
-            random_enigma.l_rotor.name,
-            random_enigma.m_rotor.name,
-            random_enigma.r_rotor.name,
+            top_rotor,
+            middle_rotor,
+            bottom_rotor,
             'ZZZ',
-            random_enigma.reflector.name,
+            reflector,
             settings,
             connections,
             input_letter
         )
+
+        print('Decoding...')
+        try:
+            data[num_closures].append(bombe.auto_run())
+        except:
+            data[num_closures] = [bombe.auto_run()]
+
+    else:
+        print('No closures...')
+
+y_data = []
+for n in data:
+    y_data.append(sum(data[n])/len(data[n]))
+
+plt.plot([x for x in data], y_data)
+plt.show()

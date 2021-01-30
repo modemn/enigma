@@ -1,9 +1,10 @@
-import sys
-import random
-import networkx as nx
-import csv
-import matplotlib.pyplot as plt
 from pprint import pprint
+import matplotlib.pyplot as plt
+import csv
+import networkx as nx
+import random
+import sys
+
 from enigma import Enigma
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
