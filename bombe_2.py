@@ -1,36 +1,10 @@
-import sys
 from enigma import Enigma
 from indicator import Indicator
-from menu_generator import MenuGenerator
+from timer import Timer
 from pprint import pprint
-import time
 import csv
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-
-class TimerError(Exception):
-    """A custom exception used to report errors in use of Timer class"""
-
-
-class Timer:
-    def __init__(self):
-        self._start_time = None
-        self.elapsed_time = 0
-
-    def start(self):
-        """Start a new timer"""
-        self._start_time = time.perf_counter()
-
-    def stop(self):
-        """Stop the timer, and report the elapsed time"""
-        if self._start_time is None:
-            raise TimerError(f"Timer is not running. Use .start() to start it")
-
-        elapsed_time = time.perf_counter() - self._start_time
-        self.elapsed_time += elapsed_time
-        # print(f"Elapsed time: {self.elapsed_time:0.4f} seconds")
-        return self.elapsed_time
 
 
 class Bombe():
@@ -164,6 +138,7 @@ class Bombe():
                 self.menu[connections[i][1]].append(backward_edge)
 
         self.num_stops = 0
+        self.auto_running = False
 
     def run(self):
         timer = Timer()
@@ -175,25 +150,26 @@ class Bombe():
         # and a stop hasn't occurred
         while ((iteration < 17576) and (not stop)):
 
-            top_row = ''
-            middle_row = ''
-            bottom_row = ''
+            if (not self.auto_running):
+                top_row = ''
+                middle_row = ''
+                bottom_row = ''
 
-            for scrambler in self.scramblers:
-                top_row += str(scrambler.l_rotor.current_letter_setting())
-                middle_row += str(scrambler.m_rotor.current_letter_setting())
-                bottom_row += str(scrambler.r_rotor.current_letter_setting())
+                for scrambler in self.scramblers:
+                    top_row += str(scrambler.l_rotor.current_letter_setting())
+                    middle_row += str(scrambler.m_rotor.current_letter_setting())
+                    bottom_row += str(scrambler.r_rotor.current_letter_setting())
 
-            top_row += ' '+str(self.indicator.t_rotor.current_letter())
-            middle_row += ' '+str(self.indicator.m_rotor.current_letter())
-            bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
+                top_row += ' '+str(self.indicator.t_rotor.current_letter())
+                middle_row += ' '+str(self.indicator.m_rotor.current_letter())
+                bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
 
-            print(iteration, '----------------------------------')
-            print('Scrambler settings:')
-            print(top_row)
-            print(middle_row)
-            print(bottom_row)
-            print()
+                print(iteration, '----------------------------------')
+                print('Scrambler settings:')
+                print(top_row)
+                print(middle_row)
+                print(bottom_row)
+                print()
 
             # Intialize dictionary keeping track of visited nodes
             visited = {}
@@ -251,21 +227,51 @@ class Bombe():
                     # If the steckers are consistent and there was at least 1 consistent letter, then stop!
                     if (self.check_steckers(self.steckers) and valid_stop):
                         time = timer.stop()
-                        self.num_stops += 1
-                        with open('bombe_output.csv', 'a', newline='') as file:
-                            wr = csv.writer(file)
-                            wr.writerow(
-                                ['STOP {}'.format(str(self.num_stops))])
-                            wr.writerow(
-                                [f'Time: {time:0.4f}  seconds'])
-                            wr.writerow(['Starting Letters: {}'.format(
-                                self.starting_letters)])
-                            wr.writerow(['Possible Steckers: {}'.format(
-                                self.print_steckers())])
-                            wr.writerow(['Possible Ring Settings: {}'.format(
-                                self.print_ring_settings())])
-                            wr.writerow([])
-                        timer.start()
+                        if (self.auto_running):
+                            self.num_stops += 1
+                            with open('bombe_output.csv', 'a', newline='') as file:
+                                wr = csv.writer(file)
+                                wr.writerow(
+                                    ['STOP {}'.format(str(self.num_stops))])
+                                wr.writerow(
+                                    [f'Time: {time:0.4f}  seconds'])
+                                wr.writerow(['Starting Letters: {}'.format(
+                                    self.starting_letters)])
+                                wr.writerow(['Possible Steckers: {}'.format(
+                                    self.print_steckers())])
+                                wr.writerow(['Possible Ring Settings: {}'.format(
+                                    self.print_ring_settings())])
+                                wr.writerow([])
+                            timer.start()
+                        else:
+                            print(
+                                '######################## STOP ########################')
+
+                            print()
+                            print(f'Time elapsed: {time:0.04f} seconds')
+
+                            print('Outputs through closures:')
+                            for closure in closures:
+                                pprint(dfs_tree_paths[closure])
+                                print()
+                            print('Consistent letters:', consistent_letters)
+                            print()
+
+                            print()
+                            print('Rotors:', self.l_rotor,
+                                  self.m_rotor, self.r_rotor)
+                            print()
+                            print('Starting letters:', self.starting_letters)
+                            print()
+                            print('Possible steckers:', self.print_steckers())
+                            print()
+                            print('Possible ring settings:',
+                                  self.print_ring_settings())
+                            print()
+                            print(
+                                '######################## STOP ########################')
+                            input()
+                            timer.start()
 
             # Step scramblers
             for scrambler in self.scramblers:
@@ -277,9 +283,16 @@ class Bombe():
             iteration += 1
 
         end_time = timer.stop()
-        with open('bombe_output.csv', 'a', newline='') as file:
-            wr = csv.writer(file)
-            wr.writerow([f'End time: {end_time:0.4f}'])
+        if (self.auto_running):
+            with open('bombe_output.csv', 'a', newline='') as file:
+                wr = csv.writer(file)
+                wr.writerow([f'End time: {end_time:0.4f}'])
+        else:
+            print(f'Total time: {end_time:0.04f} seconds')
+
+    def auto_run(self):
+        self.auto_running = True
+        self.run()
 
     # Function that geneates steckers and checks if they are consistent
     def generate_steckers(self, path, outputs, consistent_letter):
@@ -391,76 +404,3 @@ class Bombe():
         to_print += str(ALPHABET.find(self.indicator.m_rotor.current_letter())+1)+' '
         to_print += str(ALPHABET.find(self.indicator.b_rotor.current_letter())+1)
         return to_print
-
-
-top_rotor = sys.argv[1]
-middle_rotor = sys.argv[2]
-bottom_rotor = sys.argv[3]
-
-assert top_rotor in ['I', 'II', 'III', 'IV',
-                     'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
-assert middle_rotor in ['I', 'II', 'III', 'IV',
-                        'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
-assert bottom_rotor in ['I', 'II', 'III', 'IV',
-                        'V'], "That rotor does not exist or currently isnt available as an option, please pick from {'I', 'II', 'III', 'IV', 'V'}"
-
-reflector = sys.argv[4].upper()
-
-assert reflector in [
-    'A', 'B', 'C'], "That reflector does not exist or currently isnt available as an option, please pick from {'A', 'B', C}"
-
-plain_crib = sys.argv[5].replace(' ', '').upper()
-cipher_crib = sys.argv[6].replace(' ', '').upper()
-
-assert len(plain_crib) == len(
-    cipher_crib), 'The cipher and plain cribs should be of the same length'
-
-starting_letters = sys.argv[7].upper()
-
-assert len(starting_letters) == 3, 'There should be 3 starting letters!'
-
-mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-settings, connections, input_letter, num_closures = mg.get_bombe_settings()
-
-with open('bombe_output.csv', 'w', newline='') as file:
-    wr = csv.writer(file)
-    wr.writerow([
-        top_rotor,
-        middle_rotor,
-        bottom_rotor,
-        reflector,
-        plain_crib,
-        cipher_crib,
-        starting_letters,
-        input_letter
-    ])
-    wr.writerow([])
-    wr.writerows(list(zip(settings, connections)))
-    wr.writerow([])
-    wr.writerow([f'Number of closures in the settings: {num_closures}'])
-    wr.writerow([])
-
-
-print('******************BOMBE******************')
-print('Running the Bombe with the following settings:')
-print('Rotors:', top_rotor, middle_rotor, bottom_rotor)
-print('Starting Letters:', starting_letters)
-pprint(list(zip(settings, connections)))
-print('Input Letter:', input_letter)
-print('*****************************************')
-print()
-print("Press return to start the Bombe")
-input()
-
-b = Bombe(
-    top_rotor,
-    middle_rotor,
-    bottom_rotor,
-    starting_letters,
-    reflector,
-    settings,
-    connections,
-    input_letter
-)
-
-b.run()
