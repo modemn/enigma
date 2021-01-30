@@ -1,9 +1,9 @@
 reflector_dict = {
-    'A': {'name': 'UKW-A',
+    'A': {'name': 'A',
           'output': 'EJMZALYXVBWFCRQUONTSPIKHGD'},
-    'B': {'name': 'UKW-B',
+    'B': {'name': 'B',
           'output': 'YRUHQSLDPXNGOKMIEBFZCWVJAT'},
-    'C': {'name': 'UKW-C',
+    'C': {'name': 'C',
           'output': 'FVPJIAOYEDRZXWGCTKUQSBNMHL'}
 }
 
