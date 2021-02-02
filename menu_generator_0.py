@@ -130,7 +130,7 @@ class MenuGenerator:
                     path, path_len = self.shortest_path_between_closures(
                         closures[0], neighbour)
 
-                    # If adding the path to the clousre and all its edges to the
+                    # If adding the path to the closure and all its edges to the
                     # connections doesn't go over our limit of 12, then add it
                     if (len(self.scrambler_connections) + len(neighbour) + path_len < 12):
                         self.add_settings(''.join(path))
@@ -154,7 +154,6 @@ class MenuGenerator:
                             self.add_settings(edge)
                             added = True
         else:
-            # TODO: Need to implement adding settings for when there are no closures in the menu
             return [], [], '!', -1
 
         joined_connections = ''.join(self.scrambler_connections)
@@ -168,14 +167,14 @@ class MenuGenerator:
 # print('Plain crib:')
 # plain_crib = input().replace(" ", "").upper()
 # plain_crib = 'WETTERVORHERSAGE'
-# plain_crib = 'TAETIGKEITSBERIQTVOM'
-plain_crib = 'ORSITAMETC'
+plain_crib = 'TAETIGKEITSBERIQTVOM'
+# plain_crib = 'ORSITAMETC'
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'
-# cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
-cipher_crib = 'YITCWTUWRT'
+cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
+# cipher_crib = 'YITCWTUWRT'
 
 # print('Starting letters:')
 # starting_letters = input().replace(" ", "").upper()
