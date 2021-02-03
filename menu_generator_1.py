@@ -63,7 +63,7 @@ class MenuGenerator:
                 if (set(''.join(cl)) not in [set(x) for x in closures]):
                     closures.append(''.join(cl))
 
-        return closures
+        return closures, len(closures)
 
     def shortest_path_between_closures(self, closure_1, closure_2):
         shortest_path = None
@@ -94,87 +94,115 @@ class MenuGenerator:
 
     def get_bombe_settings(self):
 
-        # Find all the closures in the menu
-        closures = self.get_closures(self.menu)
-        closures.sort(key=len)
-        closures = [x for x in closures if len(x) <= 11]
-        closures.reverse()
-        num_closures = 0
+        comps = nx.connected_components(self.menu)
+        component_graphs = {}
+        for comp in comps:
+            closure_info = self.get_closures((self.menu.subgraph(comp)))
+            component_graphs[tuple(comp)] = (
+                # Number of closures in the subgraph
+                closure_info[1],
+                # Total number of edges in the closures
+                sum([len(x) for x in closure_info[0]]),
+                # Nodes in the closures
+                closure_info[0]
+            )
 
-        if (len(closures) > 0):
+        new_menu = nx.Graph()
+
+        while len(component_graphs) > 0:
+            # Find the component with the most closures,
+            # tie break with component which has most closure edges
+            max_comp = max(component_graphs, key=component_graphs.get)
+
+            # Add the max component to the new_menu only if it has at least one closure,
+            # max component could have no closures if the crib pair menu gives no clousres at all
+            if component_graphs[max_comp][0] > 0:
+                new_menu = self.menu.subgraph(max_comp)
+                break
+            else:
+                component_graphs.popitem(max_comp)
+
+        # If there are no closures in the menu, return nothing
+        if len(new_menu) == 0:
+            return [], [], '!', -1
+        else:
+            closures = component_graphs[max(
+                component_graphs, key=component_graphs.get)][2]
+            closures.sort(key=len)
+            # Remove closures with more than 12 edges
+            closures = [x for x in closures if len(x) <= 12]
+            closures.reverse()
+            num_closures = 0
+
+            # Always add the largest closure
             self.add_settings(closures[0]+closures[0][0])
             num_closures += 1
 
-            # Check for and remove disconnected closures if there are more than one closures
-            if (len(closures) > 1):
-                # Initialise dictionary
-                connected_closures = {}
-                for cl in closures:
-                    connected_closures[cl] = []
-                # Iterate through the closures
-                for i in range(len(closures)):
-                    # Check for a path to all other closures
-                    for j in range(i+1, len(closures)):
-                        # If there is a path, save it in the dictionary
-                        if (nx.has_path(self.menu, closures[i][0], closures[j][0])):
-                            connected_closures[closures[i]].append(closures[j])
-                            connected_closures[closures[j]].append(closures[i])
+            # Add any other closures to the settings
+            for cl in closures[1:]:
+                # Find shortest path to the next largest closure
+                path, path_len = self.shortest_path_between_closures(
+                    closures[0], cl)
 
-                # Keep only the connected closures ie keys in the dictionary with a non-zero length value
-                closures = [v[0]
-                            for v in connected_closures.items() if len(v[1])]
+                # If adding the path to the closure and all its edges to connections doesn't go over our limit of 12, then add it
+                if (len(self.scrambler_connections) + len(cl) + path_len < 12):
+                    self.add_settings(''.join(path))
+                    self.add_settings(cl+cl[0])
+                    num_closures += 1
 
-                # Iterate through the closures connected to the first closure
-                for neighbour in connected_closures[closures[0]]:
-                    # Find shortest path to the neighbouring clousre
-                    path, path_len = self.shortest_path_between_closures(
-                        closures[0], neighbour)
+            # print(self.scrambler_settings, self.scrambler_connections)
 
-                    # If adding the path to the closure and all its edges to the
-                    # connections doesn't go over our limit of 12, then add it
-                    if (len(self.scrambler_connections) + len(neighbour) + path_len < 12):
-                        self.add_settings(''.join(path))
-                        self.add_settings(neighbour+neighbour[0])
-                        num_closures += 1
+            # Collect the edges available to be added to the settings
+            available_edges = nx.Graph(new_menu)
+            available_edges.remove_edges_from(self.scrambler_connections)
+            # Remove nodes that have no edges, leaving endpoint nodes to available edges only
+            available_edges.remove_nodes_from(
+                list(nx.isolates(available_edges)))
 
-            # If there is still space for more scramblers then add on tails
-            while (len(self.scrambler_connections) < 12):
-                added = False
-                while not added:
-                    settings_nodes = list(
-                        set(''.join(self.scrambler_connections)))
-                    node = random.choice(settings_nodes)
-                    for neighbour in self.menu[node]:
-                        edge = str(node+neighbour)
-                        try:
-                            edge_label = self.edge_labels[tuple(edge)]
-                        except:
-                            edge_label = self.edge_labels[tuple(edge[::-1])]
-                        if (edge_label not in self.scrambler_settings):
-                            self.add_settings(edge)
-                            added = True
-        else:
-            return [], [], '!', -1
+            # If there is still space for more scramblers and there are edges availble to add then add on tails
+            while (available_edges.size() > 0 and len(self.scrambler_connections) < 12):
 
-        joined_connections = ''.join(self.scrambler_connections)
-        settings_degrees = dict((x, joined_connections.count(x))
-                                for x in set(joined_connections))
-        input_letter = max(settings_degrees, key=settings_degrees.get)
+                available_nodes = [x for x in available_edges.nodes if x in list(
+                    set(''.join(self.scrambler_connections)))]
 
-        return self.scrambler_settings, self.scrambler_connections, input_letter, num_closures
+                # print(available_edges.nodes)
+                # print(available_nodes)
+                # input()
+
+                # Pick a random node from the endpoints of available edges and a random neighbour as the edge
+                node = random.choice(list(available_nodes))
+                neighbour = random.choice(list(available_edges[node]))
+                edge = str(node+neighbour)
+
+                # Add the edge to the settings
+                self.add_settings(edge)
+
+                # Remove the edge from available edges
+                available_edges.remove_edges_from([edge])
+                available_edges.remove_nodes_from(
+                    list(nx.isolates(available_edges)))
+
+            # Find the input letter as the one with the highest degree in our menu
+            joined_connections = ''.join(self.scrambler_connections)
+            settings_degrees = dict((x, joined_connections.count(x))
+                                    for x in set(joined_connections))
+            input_letter = max(settings_degrees, key=settings_degrees.get)
+
+            return self.scrambler_settings, self.scrambler_connections, input_letter, num_closures
 
 
+# kina jr
 # print('Plain crib:')
 # plain_crib = input().replace(" ", "").upper()
 # plain_crib = 'WETTERVORHERSAGE'
-plain_crib = 'TAETIGKEITSBERIQTVOM'
-# plain_crib = 'ORSITAMETC'
+# plain_crib = 'TAETIGKEITSBERIQTVOM'
+plain_crib = 'ORSITAMETC'
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'
-cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
-# cipher_crib = 'YITCWTUWRT'
+# cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
+cipher_crib = 'YITCWTUWRT'
 
 # print('Starting letters:')
 # starting_letters = input().replace(" ", "").upper()
@@ -185,6 +213,5 @@ starting_letters = 'ZZZ'
 #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
 mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-# mg.draw_menu()
-settings, connections, _, _ = mg.get_bombe_settings()
-pprint(list(zip(settings, connections)))
+pprint(mg.get_bombe_settings())
+mg.draw_menu()
