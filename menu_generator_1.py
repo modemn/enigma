@@ -197,12 +197,16 @@ class MenuGenerator:
 # plain_crib = 'WETTERVORHERSAGE'
 # plain_crib = 'TAETIGKEITSBERIQTVOM'
 # plain_crib = 'ORSITAMETC'
+# 111111111111111111111111111111111111111111111
+# plain_crib = 'ABCDADEGFHHI'
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
 # cipher_crib = 'SNMKGGSTZZUGARLV'
 # cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
 # cipher_crib = 'YITCWTUWRT'
+# 111111111111111111111111111111111111111111111
+# cipher_crib = 'BCDBEFGFHIJJ'
 
 # print('Starting letters:')
 # starting_letters = input().replace(" ", "").upper()
