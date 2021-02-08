@@ -228,20 +228,20 @@ class Bombe():
                     if (self.check_steckers(self.steckers) and valid_stop):
                         time = timer.stop()
                         if (self.auto_running):
-                            self.num_stops += 1
-                            with open('bombe_output.csv', 'a', newline='') as file:
-                                wr = csv.writer(file)
-                                wr.writerow(
-                                    ['STOP {}'.format(str(self.num_stops))])
-                                wr.writerow(
-                                    [f'Time: {time:0.4f}  seconds'])
-                                wr.writerow(['Starting Letters: {}'.format(
-                                    self.starting_letters)])
-                                wr.writerow(['Possible Steckers: {}'.format(
-                                    self.print_steckers())])
-                                wr.writerow(['Possible Ring Settings: {}'.format(
-                                    self.print_ring_settings())])
-                                wr.writerow([])
+                            # self.num_stops += 1
+                            # with open('bombe_output.csv', 'a', newline='') as file:
+                            #     wr = csv.writer(file)
+                            #     wr.writerow(
+                            #         ['STOP {}'.format(str(self.num_stops))])
+                            #     wr.writerow(
+                            #         [f'Time: {time:0.4f}  seconds'])
+                            #     wr.writerow(['Starting Letters: {}'.format(
+                            #         self.starting_letters)])
+                            #     wr.writerow(['Possible Steckers: {}'.format(
+                            #         self.print_steckers())])
+                            #     wr.writerow(['Possible Ring Settings: {}'.format(
+                            #         self.print_ring_settings())])
+                            #     wr.writerow([])
                             timer.start()
                         else:
                             print(
@@ -284,9 +284,10 @@ class Bombe():
 
         end_time = timer.stop()
         if (self.auto_running):
-            with open('bombe_output.csv', 'a', newline='') as file:
-                wr = csv.writer(file)
-                wr.writerow([f'End time: {end_time:0.4f}'])
+            # with open('bombe_output.csv', 'a', newline='') as file:
+            #     wr = csv.writer(file)
+            #     wr.writerow([f'End time: {end_time:0.4f}'])
+            return end_time
         else:
             print(f'Total time: {end_time:0.04f} seconds')
             return end_time

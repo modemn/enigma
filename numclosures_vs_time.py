@@ -1,4 +1,4 @@
-from menu_generator import MenuGenerator
+from menu_generator_1 import MenuGenerator
 from bombe_2 import Bombe
 from enigma import Enigma
 import random
@@ -6,6 +6,7 @@ import sys
 import csv
 import networkx as nx
 import matplotlib.pyplot as plt
+from pprint import pprint
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -34,19 +35,19 @@ def get_random_enigma():
         steckers
     )
 
-    print()
-    print()
-    print('Enigma Starting Settings:')
-    print('*************************')
-    print('Rotors Selected:', enigma.l_rotor.name,
-          enigma.m_rotor.name, enigma.r_rotor.name)
-    print('Rotor Setting:', enigma.l_rotor.current_letter_setting(),
-          enigma.m_rotor.current_letter_setting(), enigma.r_rotor.current_letter_setting())
-    print('Rotor Ring Settings:', enigma.l_rotor.ring_setting,
-          enigma.m_rotor.ring_setting, enigma.r_rotor.ring_setting)
-    print('Reflector Selected:', enigma.reflector.name)
-    print('Swapped Letters:', steckers)
-    print('*************************')
+    # print()
+    # print()
+    # print('Enigma Starting Settings:')
+    # print('*************************')
+    # print('Rotors Selected:', enigma.l_rotor.name,
+    #       enigma.m_rotor.name, enigma.r_rotor.name)
+    # print('Rotor Setting:', enigma.l_rotor.current_letter_setting(),
+    #       enigma.m_rotor.current_letter_setting(), enigma.r_rotor.current_letter_setting())
+    # print('Rotor Ring Settings:', enigma.l_rotor.ring_setting,
+    #       enigma.m_rotor.ring_setting, enigma.r_rotor.ring_setting)
+    # print('Reflector Selected:', enigma.reflector.name)
+    # print('Swapped Letters:', steckers)
+    # print('*************************')
 
     # with open('test{}.txt'.format(str(x+1)), 'w', newline='') as file:
     #     file.write(
@@ -99,7 +100,7 @@ def make_menu(plain_crib, cipher_crib):
 
 
 # crib_len = int(sys.argv[1])
-crib_len = 10
+crib_len = 12
 
 data = {}
 
@@ -110,44 +111,43 @@ ciphertext = random_enigma.encrypt(PLAINTEXT)
 for i in range(len(PLAINTEXT)):
     plain_crib = PLAINTEXT[i:i+crib_len]
     cipher_crib = ciphertext[i:i+crib_len]
-    print(plain_crib, cipher_crib)
+    # print(plain_crib, cipher_crib)
 
-    print('Making menu...')
+    # print('Making menu...')
     menu = make_menu(plain_crib, cipher_crib)
 
-    print('Getting closures...')
+    # print('Getting closures...')
     closures = get_closures(menu)
 
-    print('Getting settings...')
-    mg = MenuGenerator(plain_crib, cipher_crib, 'ZZZ')
-    settings, connections, input_letter, num_closures = mg.get_bombe_settings()
+    if (len(closures) > 0):
+        # print('Getting settings...')
+        mg = MenuGenerator(plain_crib, cipher_crib, 'ZZZ')
+        settings, connections, input_letter, num_closures = mg.get_bombe_settings()
 
-    if (num_closures > 0):
-        print('Bombe time...')
-
+        # print('Bombe time...')
         top_rotor = random_enigma.l_rotor.name
         middle_rotor = random_enigma.m_rotor.name
         bottom_rotor = random_enigma.r_rotor.name
         reflector = random_enigma.reflector.name
 
-        with open('bombe_output.csv', 'w', newline='') as file:
-            wr = csv.writer(file)
-            wr.writerow([
-                top_rotor,
-                middle_rotor,
-                bottom_rotor,
-                reflector,
-                plain_crib,
-                cipher_crib,
-                'ZZZ',
-                input_letter
-            ])
-            wr.writerow([])
-            wr.writerows(list(zip(settings, connections)))
-            wr.writerow([])
-            wr.writerow(
-                [f'Number of closures in the settings: {num_closures}'])
-            wr.writerow([])
+        # with open('bombe_output.csv', 'w', newline='') as file:
+        #     wr = csv.writer(file)
+        #     wr.writerow([
+        #         top_rotor,
+        #         middle_rotor,
+        #         bottom_rotor,
+        #         reflector,
+        #         plain_crib,
+        #         cipher_crib,
+        #         'ZZZ',
+        #         input_letter
+        #     ])
+        #     wr.writerow([])
+        #     wr.writerows(list(zip(settings, connections)))
+        #     wr.writerow([])
+        #     wr.writerow(
+        #         [f'Number of closures in the settings: {num_closures}'])
+        #     wr.writerow([])
 
         bombe = Bombe(
             top_rotor,
@@ -160,11 +160,12 @@ for i in range(len(PLAINTEXT)):
             input_letter
         )
 
-        print('Decoding...')
         try:
             data[num_closures].append(bombe.auto_run())
         except:
             data[num_closures] = [bombe.auto_run()]
+
+        pprint(data)
 
     else:
         print('No closures...')

@@ -2,7 +2,7 @@ import sys
 import csv
 from pprint import pprint
 from bombe_2 import Bombe
-from menu_generator import MenuGenerator
+from menu_generator_1 import MenuGenerator
 
 top_rotor = sys.argv[1]
 middle_rotor = sys.argv[2]
