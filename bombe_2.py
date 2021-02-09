@@ -70,11 +70,14 @@ class Bombe():
 
     """
 
-    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input):
+    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input_letter, printing):
         # Store rotors for outputting at a stop
         self.l_rotor = t_rotor
         self.m_rotor = m_rotor
         self.r_rotor = b_rotor
+
+        # Store the reflector for outputting encoding
+        self.reflector = reflector
 
         # Calculate what the starting letter should really be for outputting at a stop
         self.starting_letters = ''
@@ -82,7 +85,7 @@ class Bombe():
             self.starting_letters += ALPHABET[ALPHABET.find(letter)-1]
 
         # Initialize the input letter to DFS with as the source node
-        self.input = input
+        self.input = input_letter
 
         # Initialize scramblers
         self.scramblers = []
@@ -138,7 +141,8 @@ class Bombe():
                 self.menu[connections[i][1]].append(backward_edge)
 
         self.num_stops = 0
-        self.auto_running = False
+        self.printing = printing
+        self.crib = ()
 
     def run(self):
         timer = Timer()
@@ -150,7 +154,7 @@ class Bombe():
         # and a stop hasn't occurred
         while ((iteration < 17576) and (not stop)):
 
-            if (not self.auto_running):
+            if self.printing:
                 top_row = ''
                 middle_row = ''
                 bottom_row = ''
@@ -227,23 +231,42 @@ class Bombe():
                     # If the steckers are consistent and there was at least 1 consistent letter, then stop!
                     if (self.check_steckers(self.steckers) and valid_stop):
                         time = timer.stop()
-                        if (self.auto_running):
-                            self.num_stops += 1
-                            with open('bombe_output.csv', 'a', newline='') as file:
-                                wr = csv.writer(file)
-                                wr.writerow(
-                                    ['STOP {}'.format(str(self.num_stops))])
-                                wr.writerow(
-                                    [f'Time: {time:0.4f}  seconds'])
-                                wr.writerow(['Starting Letters: {}'.format(
-                                    self.starting_letters)])
-                                wr.writerow(['Possible Steckers: {}'.format(
-                                    self.print_steckers())])
-                                wr.writerow(['Possible Ring Settings: {}'.format(
-                                    self.print_ring_settings())])
-                                wr.writerow([])
-                            timer.start()
-                        else:
+
+                        # If we got given a plain_crib then set up an enigma machine and encode with settings from the stop
+                        if len(self.crib[0]) > 0:
+                            enigma_steckers = []
+                            for s in self.steckers:
+                                if (len(self.steckers[s]) > 0 and (s not in enigma_steckers) and (s != self.steckers[s])):
+                                    enigma_steckers.append(
+                                        str(s+self.steckers[s]))
+
+                            enigma_ring_settings = []
+                            raw_ring_settings = [
+                                self.indicator.t_rotor.current_letter(),
+                                self.indicator.m_rotor.current_letter(),
+                                self.indicator.b_rotor.current_letter()
+                            ]
+
+                            for rs in raw_ring_settings:
+                                enigma_ring_settings.append(
+                                    ALPHABET.find(rs) + 1
+                                )
+
+                            stop_enigma = Enigma(
+                                False,
+                                False,
+                                True,
+                                [self.l_rotor, self.m_rotor, self.r_rotor],
+                                list(self.starting_letters),
+                                enigma_ring_settings,
+                                self.reflector,
+                                enigma_steckers
+                            )
+
+                            stop_encryption = stop_enigma.encrypt(
+                                self.crib[0])
+
+                        if self.printing:
                             print(
                                 '######################## STOP ########################')
 
@@ -270,7 +293,35 @@ class Bombe():
                             print()
                             print(
                                 '######################## STOP ########################')
+                            if len(self.crib[0]) > 0:
+                                print(f'{self.crib[0]} <- Plain crib')
+                                print(f'{self.crib[1]} <- Actual Cipher crib')
+                                print(
+                                    f'{stop_encryption} <- Encrypted Crib with stop settings')
                             input()
+                            timer.start()
+                        else:
+                            self.num_stops += 1
+                            with open('bombe_output.csv', 'a', newline='') as file:
+                                wr = csv.writer(file)
+                                wr.writerow(
+                                    [f'STOP {str(self.num_stops)}'])
+                                wr.writerow(
+                                    [f'Time: {time:0.4f}  seconds'])
+                                wr.writerow(
+                                    [f'Starting Letters: {self.starting_letters}'])
+                                wr.writerow(
+                                    [f'Possible Steckers: {self.print_steckers()}'])
+                                wr.writerow(
+                                    [f'Possible Ring Settings: {self.print_ring_settings()}'])
+                                wr.writerow([])
+                                if len(self.crib[0]) > 0:
+                                    wr.writerow(
+                                        [f'{self.crib[0]} <- Plain Crib'])
+                                    wr.writerow(
+                                        [f'{self.crib[1]} <- Actual Cipher crib'])
+                                    wr.writerow(
+                                        [f'{stop_encryption} <- Encrypted Crib with stop settings'])
                             timer.start()
 
             # Step scramblers
@@ -283,7 +334,7 @@ class Bombe():
             iteration += 1
 
         end_time = timer.stop()
-        if (self.auto_running):
+        if (not self.printing):
             with open('bombe_output.csv', 'a', newline='') as file:
                 wr = csv.writer(file)
                 wr.writerow([f'End time: {end_time:0.4f}'])
@@ -292,9 +343,9 @@ class Bombe():
             print(f'Total time: {end_time:0.04f} seconds')
             return end_time
 
-    def auto_run(self):
-        self.auto_running = True
-        return self.run()
+    def auto_run(self, plain_crib, cipher_crib):
+        self.crib = (plain_crib, cipher_crib)
+        self.run()
 
     # Function that geneates steckers and checks if they are consistent
     def generate_steckers(self, path, outputs, consistent_letter):
@@ -310,7 +361,6 @@ class Bombe():
                 consistent_letter)]] += path[i % len(self.scramblers)]
 
     # Function that check if given steckers have no contradictions
-
     def check_steckers(self, steckers):
         # Check if there are any steckers at all
         values = ''.join(steckers.values())

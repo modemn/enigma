@@ -71,8 +71,9 @@ b = Bombe(
     reflector,
     settings,
     connections,
-    input_letter
+    input_letter,
+    True
 )
 
 print('RUNNING...')
-b.auto_run()
+b.auto_run(plain_crib, cipher_crib)
