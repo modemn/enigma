@@ -2,6 +2,7 @@ import sys
 from bombe_2 import Bombe
 from menu_generator_1 import MenuGenerator
 from pprint import pprint
+from timer import Timer
 
 ROTORS = ['I', 'II', 'III', 'IV', 'V']
 REFLECTORS = ['A', 'B', 'C']
@@ -24,6 +25,9 @@ settings, connections, input_letter, num_closures = mg.get_bombe_settings()
 
 rotor_combos = [(x, y, z)
                 for x in ROTORS for y in ROTORS for z in ROTORS if x != y if y != z if x != z]
+
+timer = Timer()
+timer.start()
 
 for top_rotor, middle_rotor, bottom_rotor in rotor_combos:
     for reflector in REFLECTORS:
@@ -52,3 +56,5 @@ for top_rotor, middle_rotor, bottom_rotor in rotor_combos:
 
         print('RUNNING...')
         b.auto_run(plain_crib, cipher_crib)
+
+print(timer.stop())
