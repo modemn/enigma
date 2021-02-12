@@ -62,12 +62,6 @@ class Bombe():
             Returns:
                 (str): The output of the scrambler.
 
-        print_steckers():
-            Prints the steckers with pairs of letters being plugged and spaces between each pair
-
-        print_ring_settings():
-            Prints the ring settings as number poisitions and letters
-
     """
 
     def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input_letter, printing):
@@ -147,12 +141,11 @@ class Bombe():
     def run(self):
         timer = Timer()
         timer.start()
-        stop = False
         iteration = 0
 
         # While we are not done going through the search space
         # and a stop hasn't occurred
-        while ((iteration < 17576) and (not stop)):
+        while ((iteration < 17576)):
 
             if self.printing:
                 top_row = ''
@@ -234,31 +227,21 @@ class Bombe():
 
                         # If we got given a plain_crib then set up an enigma machine and encode with settings from the stop
                         if len(self.crib[0]) > 0:
+                            adjusted_ring_settings, adjusted_starting_letters = self.adjust_ring_start_letters()
+
                             enigma_steckers = []
-                            for s in self.steckers:
-                                if (len(self.steckers[s]) > 0 and (s not in enigma_steckers) and (s != self.steckers[s])):
+                            for s in self.steckers.keys():
+                                if (len(self.steckers[s]) > 0 and (s not in ''.join(enigma_steckers)) and (s != self.steckers[s])):
                                     enigma_steckers.append(
                                         str(s+self.steckers[s]))
-
-                            enigma_ring_settings = []
-                            raw_ring_settings = [
-                                self.indicator.t_rotor.current_letter(),
-                                self.indicator.m_rotor.current_letter(),
-                                self.indicator.b_rotor.current_letter()
-                            ]
-
-                            for rs in raw_ring_settings:
-                                enigma_ring_settings.append(
-                                    ALPHABET.find(rs) + 1
-                                )
 
                             stop_enigma = Enigma(
                                 False,
                                 False,
                                 True,
                                 [self.l_rotor, self.m_rotor, self.r_rotor],
-                                list(self.starting_letters),
-                                enigma_ring_settings,
+                                adjusted_starting_letters,
+                                adjusted_ring_settings,
                                 self.reflector,
                                 enigma_steckers
                             )
@@ -269,27 +252,19 @@ class Bombe():
                         if self.printing:
                             print(
                                 '######################## STOP ########################')
-
                             print()
                             print(f'Time elapsed: {time:0.04f} seconds')
-
-                            print('Outputs through closures:')
-                            for closure in closures:
-                                pprint(dfs_tree_paths[closure])
-                                print()
-                            print('Consistent letters:', consistent_letters)
-                            print()
-
                             print()
                             print('Rotors:', self.l_rotor,
                                   self.m_rotor, self.r_rotor)
                             print()
-                            print('Starting letters:', self.starting_letters)
+                            print('Possible ring settings:',
+                                  ' '.join(adjusted_ring_settings))
+                            print()
+                            print('Starting letters:', ' '.join(
+                                adjusted_starting_letters))
                             print()
                             print('Possible steckers:', self.print_steckers())
-                            print()
-                            print('Possible ring settings:',
-                                  self.print_ring_settings())
                             print()
                             print(
                                 '######################## STOP ########################')
@@ -309,11 +284,12 @@ class Bombe():
                                 wr.writerow(
                                     [f'Time: {time:0.4f}  seconds'])
                                 wr.writerow(
-                                    [f'Starting Letters: {self.starting_letters}'])
+                                    [f'Possible Ring Settings:', ' '.join(adjusted_ring_settings)])
+                                wr.writerow(
+                                    [f'Starting Letters:', ' '.join(
+                                        adjusted_starting_letters)])
                                 wr.writerow(
                                     [f'Possible Steckers: {self.print_steckers()}'])
-                                wr.writerow(
-                                    [f'Possible Ring Settings: {self.print_ring_settings()}'])
                                 wr.writerow([])
                                 if len(self.crib[0]) > 0:
                                     wr.writerow(
@@ -447,12 +423,26 @@ class Bombe():
                 to_print += s+self.steckers[s]+' '
         return to_print
 
-    def print_ring_settings(self):
-        to_print = ''
-        to_print += self.indicator.t_rotor.current_letter()+' '
-        to_print += self.indicator.m_rotor.current_letter()+' '
-        to_print += self.indicator.b_rotor.current_letter()+' - '
-        to_print += str(ALPHABET.find(self.indicator.t_rotor.current_letter())+1)+' '
-        to_print += str(ALPHABET.find(self.indicator.m_rotor.current_letter())+1)+' '
-        to_print += str(ALPHABET.find(self.indicator.b_rotor.current_letter())+1)
-        return to_print
+    def adjust_ring_start_letters(self):
+        r_ring = self.indicator.b_rotor.current_letter()
+
+        # Find the position in the alphabet the right hand rotor's notch is located
+        one_after_notch_index = ALPHABET.index(
+            self.scramblers[0].r_rotor.notch) + 1
+
+        # Step the right hand ring setting the same amount
+        value = one_after_notch_index - \
+            ALPHABET.index(self.starting_letters[2])
+        r_ring_index = (ALPHABET.index(r_ring) + value) % 26
+
+        # Set the right hand starting letter to this index
+        adjusted_starting_letters = list(self.starting_letters)
+        adjusted_starting_letters[2] = ALPHABET[one_after_notch_index]
+
+        adjusted_ring_settings = [
+            str(ALPHABET.find(self.indicator.t_rotor.current_letter())+1),
+            str(ALPHABET.find(self.indicator.m_rotor.current_letter())+1),
+            str(r_ring_index+1)
+        ]
+
+        return adjusted_ring_settings, adjusted_starting_letters
