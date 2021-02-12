@@ -71,14 +71,20 @@ input_column = [
     ],
     [
         sg.CB('Continuous Mode', default=False,
-              key='continuous', enable_events=True)
+              key='continuous', enable_events=True),
+        sg.T('Warning! Continuous Mode may take a considerable amount of time',
+             visible=False, k='continuous_error', background_color='red')
     ],
     [sg.Col([reflector], k='reflector_row')],
     [sg.Col([rotors], k='rotors_row')],
 ]
 
 setting_output_column = [
-    [sg.Button('Create Menu')],
+    [
+        sg.Button('Create Menu'),
+        sg.T('That plain/cipher crib combo has no closures, please try another',
+             k='no_closure_error', background_color='red', visible=False)
+    ],
     [
         sg.T("Scrambler Settings:"),
         sg.Multiline(k='settings', disabled=True)
@@ -110,18 +116,22 @@ while True:  # Event Loop
 
     window['rotors_row'].update(visible=not values['continuous'])
     window['reflector_row'].update(visible=not values['continuous'])
+    window['continuous_error'].update(visible=values['continuous'])
 
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
     elif event == 'Create Menu':
-        top_rotor = values['t_rotor']
-        middle_rotor = values['m_rotor']
-        bottom_rotor = values['b_rotor']
+        top_rotor = values['t_rotor'].upper()
+        middle_rotor = values['m_rotor'].upper()
+        bottom_rotor = values['b_rotor'].upper()
         starting_letters = str(
-            values['sletter1']+values['sletter2']+values['sletter3'])
-        reflector = values['reflector']
-        plain_crib = values['plaincrib']
-        cipher_crib = values['ciphercrib']
+            values['sletter1'].upper() +
+            values['sletter2'].upper() +
+            values['sletter3'].upper()
+        )
+        reflector = values['reflector'].upper()
+        plain_crib = values['plaincrib'].upper()
+        cipher_crib = values['ciphercrib'].upper()
 
         mg = MenuGenerator(
             plain_crib,
@@ -130,13 +140,20 @@ while True:  # Event Loop
         )
 
         settings, connections, input_letter, _ = mg.get_bombe_settings()
+        if (len(settings) == 0):
+            window['no_closure_error'].update(visible=True)
+            window['settings'].update('')
+            window['connections'].update('')
+            window['Start Bombe'].update(disabled=True)
+            window['output'].update('')
+        else:
+            window['no_closure_error'].update(visible=False)
+            window['settings'].update(settings)
+            window['connections'].update(connections)
+            window['Start Bombe'].update(disabled=False)
+            window['output'].update('')
 
-        window['settings'].update(settings)
-        window['connections'].update(connections)
-        window['Start Bombe'].update(disabled=False)
-        window['output'].update('')
-
-        if (not values['continuous']):
+        if (not values['continuous'] and len(settings) > 0):
             print('******************BOMBE******************')
             print('Running the Bombe with the following settings:')
             print('Rotors:', top_rotor, middle_rotor, bottom_rotor)
@@ -148,9 +165,6 @@ while True:  # Event Loop
 
     elif event == 'Start Bombe':
         if values['continuous']:
-            print('CONTINUOUS MODE MAY TAKE SOME TIME')
-            print('180 possible settings to go through')
-            print()
             ROTORS = ['I', 'II', 'III', 'IV', 'V']
             REFLECTORS = ['A', 'B', 'C']
             rotor_combos = [(x, y, z)

@@ -219,6 +219,6 @@ starting_letters = 'ZZZ'
 # assert len(plain_crib) == len(
 #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-pprint(mg.get_bombe_settings())
-mg.draw_menu()
+# mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+# pprint(mg.get_bombe_settings())
+# mg.draw_menu()
