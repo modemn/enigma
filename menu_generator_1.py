@@ -98,34 +98,33 @@ class MenuGenerator:
         component_graphs = {}
         for comp in comps:
             closure_info = self.get_closures((self.menu.subgraph(comp)))
-            component_graphs[tuple(comp)] = (
-                # Number of closures in the subgraph
-                closure_info[1],
-                # Total number of edges in the closures
-                sum([len(x) for x in closure_info[0]]),
-                # Nodes in the closures
-                closure_info[0]
-            )
+            if closure_info[1] > 0:
+                component_graphs[tuple(comp)] = (
+                    # Number of closures in the subgraph
+                    closure_info[1],
+                    # Total number of edges in the closures
+                    sum([len(x) for x in closure_info[0]]),
+                    # Nodes in the closures
+                    closure_info[0]
+                )
 
-        new_menu = nx.Graph()
+        if len(component_graphs) > 0:
 
-        while len(component_graphs) > 0:
-            # Find the component with the most closures,
-            # tie break with component which has most closure edges
-            max_comp = max(component_graphs, key=component_graphs.get)
+            new_menu = nx.Graph()
 
-            # Add the max component to the new_menu only if it has at least one closure,
-            # max component could have no closures if the crib pair menu gives no clousres at all
-            if component_graphs[max_comp][0] > 0:
-                new_menu = self.menu.subgraph(max_comp)
-                break
-            else:
-                component_graphs.popitem(max_comp)
+            while len(component_graphs) > 0:
+                # Find the component with the most closures,
+                # tie break with component which has most closure edges
+                max_comp = max(component_graphs, key=component_graphs.get)
 
-        # If there are no closures in the menu, return nothing
-        if len(new_menu) == 0:
-            return [], [], '!', -1
-        else:
+                # Add the max component to the new_menu only if it has at least one closure,
+                # max component could have no closures if the crib pair menu gives no clousres at all
+                if component_graphs[max_comp][0] > 0:
+                    new_menu = self.menu.subgraph(max_comp)
+                    break
+                else:
+                    component_graphs.popitem(max_comp)
+
             closures = component_graphs[max(
                 component_graphs, key=component_graphs.get)][2]
             closures.sort(key=len)
@@ -189,12 +188,15 @@ class MenuGenerator:
             input_letter = max(settings_degrees, key=settings_degrees.get)
 
             return self.scrambler_settings, self.scrambler_connections, input_letter, num_closures
+        else:
+            return [], [], '!', -1
 
 
 # kina jr
 # print('Plain crib:')
 # plain_crib = input().replace(" ", "").upper()
-# plain_crib = 'WETTERVORHERSAGE'
+plain_crib = 'WETTERVORHERSAGE'
+# plain_crib = 'WETTERVORHERSAG'
 # plain_crib = 'TAETIGKEITSBERIQTVOM'
 # plain_crib = 'ORSITAMETC'
 # 111111111111111111111111111111111111111111111
@@ -202,7 +204,8 @@ class MenuGenerator:
 
 # print('Cipher crib:')
 # cipher_crib = input().replace(" ", "").upper()
-# cipher_crib = 'SNMKGGSTZZUGARLV'
+cipher_crib = 'SNMKGGSTZZUGARLV'
+# cipher_crib = 'SNMKGGSTZZUGARL'
 # cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
 # cipher_crib = 'YITCWTUWRT'
 # 111111111111111111111111111111111111111111111
@@ -210,12 +213,12 @@ class MenuGenerator:
 
 # print('Starting letters:')
 # starting_letters = input().replace(" ", "").upper()
-# starting_letters = 'ZZZ'
+starting_letters = 'ZZZ'
 
 # assert len(starting_letters) == 3, 'There should be 3 starting letters!'
 # assert len(plain_crib) == len(
 #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-# mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-# pprint(mg.get_bombe_settings())
-# mg.draw_menu()
+mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+pprint(mg.get_bombe_settings())
+mg.draw_menu()
