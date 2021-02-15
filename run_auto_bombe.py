@@ -1,6 +1,5 @@
 from menu_generator_1 import MenuGenerator
 from bombe_2 import Bombe
-import csv
 
 
 def run(
