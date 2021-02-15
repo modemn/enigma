@@ -1,4 +1,4 @@
-from bombe_2_for_UI import Bombe
+from bombe_2 import Bombe
 
 
 def run(
@@ -34,7 +34,9 @@ def run(
                 reflector,
                 settings,
                 connections,
-                input_letter
+                input_letter,
+                True,
+                False
             )
 
             print('RUNNING...')
