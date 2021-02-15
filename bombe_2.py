@@ -279,27 +279,22 @@ class Bombe():
 
                         if self.output:
                             self.num_stops += 1
-                            with open('bombe_output.csv', 'a', newline='') as file:
-                                wr = csv.writer(file)
-                                wr.writerow(
-                                    [f'STOP {str(self.num_stops)}'])
-                                wr.writerow(
-                                    [f'Time: {time:0.4f}  seconds'])
-                                wr.writerow(
-                                    [f'Possible Ring Settings:', ' '.join(adjusted_ring_settings)])
-                                wr.writerow(
-                                    [f'Starting Letters:', ' '.join(
-                                        adjusted_starting_letters)])
-                                wr.writerow(
-                                    [f'Possible Steckers: {self.print_steckers()}'])
-                                wr.writerow([])
+                            with open('bombe_output.txt', 'a', newline='') as file:
+                                file.write(f'STOP {str(self.num_stops)}\n')
+                                file.write(f'Time: {time:0.4f}  seconds\n\n')
+                                file.write(
+                                    f'Possible Ring Settings: {" ".join(adjusted_ring_settings)}\n')
+                                file.write(
+                                    f'Starting Letters: {" ".join(adjusted_starting_letters)}\n')
+                                file.write(
+                                    f'Possible Steckers: {self.print_steckers()}\n\n')
                                 if len(self.crib[0]) > 0:
-                                    wr.writerow(
-                                        [f'{self.crib[0]} <- Plain Crib'])
-                                    wr.writerow(
-                                        [f'{self.crib[1]} <- Actual Cipher crib'])
-                                    wr.writerow(
-                                        [f'{stop_encryption} <- Encrypted Crib with stop settings'])
+                                    file.write(
+                                        f'{self.crib[0]} <- Plain Crib\n')
+                                    file.write(
+                                        f'{self.crib[1]} <- Actual Cipher crib\n')
+                                    file.write(
+                                        f'{stop_encryption} <- Encrypted Crib with stop settings\n\n')
                             timer.start()
 
             # Step scramblers
@@ -313,9 +308,8 @@ class Bombe():
 
         end_time = timer.stop()
         if (self.output):
-            with open('bombe_output.csv', 'a', newline='') as file:
-                wr = csv.writer(file)
-                wr.writerow([f'End time: {end_time:0.4f}'])
+            with open('bombe_output.txt', 'a', newline='') as file:
+                file.write(f'End time: {end_time:0.4f}')
 
         return end_time
 
@@ -409,6 +403,7 @@ class Bombe():
     # Function that returns the encryption of the input
     # through a scrambler whose starting letters are given
     def scramble(self, starting_letters, input):
+
         # Find the index of the scrambler whose starting letters are the ones given
         scrambler_idx = [''.join(x.starting_letters) for x in self.scramblers].index(
             starting_letters)
