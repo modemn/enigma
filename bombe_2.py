@@ -148,26 +148,26 @@ class Bombe():
         # and a stop hasn't occurred
         while ((iteration < 17576)):
 
-            if self.printing:
-                top_row = ''
-                middle_row = ''
-                bottom_row = ''
+            # if self.printing:
+            #     top_row = ''
+            #     middle_row = ''
+            #     bottom_row = ''
 
-                for scrambler in self.scramblers:
-                    top_row += str(scrambler.l_rotor.current_letter_setting())
-                    middle_row += str(scrambler.m_rotor.current_letter_setting())
-                    bottom_row += str(scrambler.r_rotor.current_letter_setting())
+            #     for scrambler in self.scramblers:
+            #         top_row += str(scrambler.l_rotor.current_letter_setting())
+            #         middle_row += str(scrambler.m_rotor.current_letter_setting())
+            #         bottom_row += str(scrambler.r_rotor.current_letter_setting())
 
-                top_row += ' '+str(self.indicator.t_rotor.current_letter())
-                middle_row += ' '+str(self.indicator.m_rotor.current_letter())
-                bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
+            #     top_row += ' '+str(self.indicator.t_rotor.current_letter())
+            #     middle_row += ' '+str(self.indicator.m_rotor.current_letter())
+            #     bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
 
-                print(iteration, '----------------------------------')
-                print('Scrambler settings:')
-                print(top_row)
-                print(middle_row)
-                print(bottom_row)
-                print()
+            #     print(iteration, '----------------------------------')
+            #     print('Scrambler settings:')
+            #     print(top_row)
+            #     print(middle_row)
+            #     print(bottom_row)
+            #     print()
 
             # Intialize dictionary keeping track of visited nodes
             visited = {}
@@ -255,26 +255,28 @@ class Bombe():
                                 '######################## STOP ########################')
                             print()
                             print(f'Time elapsed: {time:0.04f} seconds')
-                            print()
                             print('Rotors:', self.l_rotor,
                                   self.m_rotor, self.r_rotor)
-                            print()
                             print('Possible ring settings:',
                                   ' '.join(adjusted_ring_settings))
-                            print()
                             print('Starting letters:', ' '.join(
                                 adjusted_starting_letters))
-                            print()
                             print('Possible steckers:', self.print_steckers())
                             print()
-                            print(
-                                '######################## STOP ########################')
                             if len(self.crib[0]) > 0:
+                                print(
+                                    '~~~~~~~~~~~~~~~~~~~~ ENCRYPTION ~~~~~~~~~~~~~~~~~~~~')
                                 print(f'{self.crib[0]} <- Plain crib')
                                 print(f'{self.crib[1]} <- Actual Cipher crib')
                                 print(
                                     f'{stop_encryption} <- Encrypted Crib with stop settings')
-                            input()
+                                print()
+                                print(
+                                    '######################## STOP ########################')
+                            else:
+                                print(
+                                    '######################## STOP ########################')
+                            print()
                             timer.start()
 
                         if self.output:
@@ -307,11 +309,13 @@ class Bombe():
             iteration += 1
 
         end_time = timer.stop()
+
+        if self.printing:
+            print(f'End time: {end_time:0.4f}')
+
         if (self.output):
             with open('bombe_output.txt', 'a', newline='') as file:
                 file.write(f'End time: {end_time:0.4f}')
-
-        return end_time
 
     def auto_run(self, plain_crib, cipher_crib):
         self.crib = (plain_crib, cipher_crib)
