@@ -155,21 +155,42 @@ while True:  # Event Loop
             window['output'].update('')
 
     elif event == 'Start Bombe':
-        b = Bombe(
-            top_rotor,
-            middle_rotor,
-            bottom_rotor,
-            starting_letters,
-            reflector,
-            settings,
-            connections,
-            input_letter,
-            True,
-            False
-        )
+        if values['continuous']:
+            print('foo')
+            # ROTORS = ['I', 'II', 'III', 'IV', 'V']
+            # REFLECTORS = ['A', 'B', 'C']
 
-        print('RUNNING...')
-        print()
-        b.auto_run(plain_crib, cipher_crib)
+            # timer = Timer()
+            # timer.start()
+
+            # run_continuous.run(
+            #     ROTORS,
+            #     REFLECTORS,
+            #     starting_letters,
+            #     input_letter,
+            #     settings,
+            #     connections,
+            #     plain_crib,
+            #     cipher_crib
+            # )
+
+            # print('Total time through all rotors:', timer.stop())
+        else:
+            b = Bombe(
+                top_rotor,
+                middle_rotor,
+                bottom_rotor,
+                starting_letters,
+                reflector,
+                settings,
+                connections,
+                input_letter,
+                True,
+                False
+            )
+
+            print('RUNNING...')
+            print()
+            b.auto_run(plain_crib, cipher_crib)
 
 window.close()
