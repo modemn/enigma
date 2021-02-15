@@ -64,7 +64,7 @@ class Bombe():
 
     """
 
-    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input_letter, printing):
+    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input_letter, printing, output):
         # Store rotors for outputting at a stop
         self.l_rotor = t_rotor
         self.m_rotor = m_rotor
@@ -136,6 +136,7 @@ class Bombe():
 
         self.num_stops = 0
         self.printing = printing
+        self.output = output
         self.crib = ()
 
     def run(self):
@@ -275,7 +276,8 @@ class Bombe():
                                     f'{stop_encryption} <- Encrypted Crib with stop settings')
                             input()
                             timer.start()
-                        else:
+
+                        if self.output:
                             self.num_stops += 1
                             with open('bombe_output.csv', 'a', newline='') as file:
                                 wr = csv.writer(file)
@@ -310,14 +312,12 @@ class Bombe():
             iteration += 1
 
         end_time = timer.stop()
-        if (not self.printing):
+        if (self.output):
             with open('bombe_output.csv', 'a', newline='') as file:
                 wr = csv.writer(file)
                 wr.writerow([f'End time: {end_time:0.4f}'])
-            return end_time
-        else:
-            print(f'Total time: {end_time:0.04f} seconds')
-            return end_time
+
+        return end_time
 
     def auto_run(self, plain_crib, cipher_crib):
         self.crib = (plain_crib, cipher_crib)
@@ -427,8 +427,8 @@ class Bombe():
         r_ring = self.indicator.b_rotor.current_letter()
 
         # Find the position in the alphabet the right hand rotor's notch is located
-        one_after_notch_index = ALPHABET.index(
-            self.scramblers[0].r_rotor.notch) + 1
+        one_after_notch_index = (ALPHABET.index(
+            self.scramblers[0].r_rotor.notch) + 1) % 26
 
         # Step the right hand ring setting the same amount
         value = one_after_notch_index - \
