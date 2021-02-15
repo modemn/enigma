@@ -1,5 +1,5 @@
 from timer import Timer
-from bombe_2_for_UI import Bombe
+from bombe_2 import Bombe
 import PySimpleGUI as sg
 from menu_generator_1 import MenuGenerator
 import run_continuous
@@ -154,53 +154,22 @@ while True:  # Event Loop
             window['Start Bombe'].update(disabled=False)
             window['output'].update('')
 
-        if (not values['continuous'] and len(settings) > 0):
-            print('******************BOMBE******************')
-            print('Running the Bombe with the following settings:')
-            print('Rotors:', top_rotor, middle_rotor, bottom_rotor)
-            print('Reflector:', reflector)
-            print('Starting Letters:', starting_letters)
-            print('Input Letter:', input_letter)
-            print('*****************************************')
-            print()
-
     elif event == 'Start Bombe':
-        if values['continuous']:
-            ROTORS = ['I', 'II', 'III', 'IV', 'V']
-            REFLECTORS = ['A', 'B', 'C']
+        b = Bombe(
+            top_rotor,
+            middle_rotor,
+            bottom_rotor,
+            starting_letters,
+            reflector,
+            settings,
+            connections,
+            input_letter,
+            True,
+            False
+        )
 
-            timer = Timer()
-            timer.start()
-
-            run_continuous.run(
-                ROTORS,
-                REFLECTORS,
-                starting_letters,
-                input_letter,
-                settings,
-                connections,
-                plain_crib,
-                cipher_crib
-            )
-
-            print('Total time through all rotors:', timer.stop())
-        else:
-            b = Bombe(
-                top_rotor,
-                middle_rotor,
-                bottom_rotor,
-                starting_letters,
-                reflector,
-                settings,
-                connections,
-                input_letter
-            )
-
-            print('RUNNING...')
-            print()
-            output = b.auto_run(plain_crib, cipher_crib)
-            print()
-            for line in output:
-                print(line)
+        print('RUNNING...')
+        print()
+        b.auto_run(plain_crib, cipher_crib)
 
 window.close()
