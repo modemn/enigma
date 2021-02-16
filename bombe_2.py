@@ -143,6 +143,7 @@ class Bombe():
         timer = Timer()
         timer.start()
         iteration = 0
+        stops = []
 
         # While we are not done going through the search space
         # and a stop hasn't occurred
@@ -299,6 +300,10 @@ class Bombe():
                                         f'{stop_encryption} <- Encrypted Crib with stop settings\n\n')
                             timer.start()
 
+                        stops += [
+                            f'Rotors: {self.scramblers[0].l_rotor.name} {self.scramblers[0].m_rotor.name} {self.scramblers[0].r_rotor.name}\nReflector: {self.reflector}\nPossible ring settings: {" ".join(adjusted_ring_settings)}\nStarting Letters: {" ".join(adjusted_starting_letters)}\nPossible Steckers: {self.print_steckers()}\n{self.crib[0]} <- Plain Crib\n{self.crib[1]} <- Actual Cipher crib\n{stop_encryption} <- Encrypted Crib with stop settings'
+                        ]
+
             # Step scramblers
             for scrambler in self.scramblers:
                 scrambler.step_rotors(True)
@@ -317,9 +322,11 @@ class Bombe():
             with open('bombe_output.txt', 'a', newline='') as file:
                 file.write(f'End time: {end_time:0.4f}\n')
 
+        return stops
+
     def auto_run(self, plain_crib, cipher_crib):
         self.crib = (plain_crib, cipher_crib)
-        self.run()
+        return self.run()
 
     # Function that geneates steckers and checks if they are consistent
     def generate_steckers(self, path, outputs, consistent_letter):
