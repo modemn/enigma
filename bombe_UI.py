@@ -145,7 +145,7 @@ def make_enigma(stop_info):
     ring_settings = stop_info[2][24:].split()
     enigma_starting_letters = stop_info[3][18:].split()
     steckers = stop_info[4][19:].split()
-    input_text = stop_info[6][:-22]
+    input_text = stop_info[-1]
 
     input_column = [
         [sg.Text(text='Input:')],
@@ -334,6 +334,7 @@ while True:  # Event Loop
             window['settings'].update(settings)
             window['connections'].update(connections)
             window['Start Bombe'].update(disabled=False)
+            window['stoplist'].update(values=[])
             window['bombe_output'].update('')
     elif event == 'Start Bombe':
         if values['continuous']:
@@ -382,13 +383,14 @@ while True:  # Event Loop
         window['bombe_output'].update(stops[int(values['stoplist'][0][-1])-1])
         window['View on Enigma'].update(visible=True)
     elif event == 'View on Enigma' and not enigma_window:
-        enigma_window = make_enigma(stops[int(values['stoplist'][0][-1])-1])
+        enigma_window = make_enigma(
+            stops[int(values['stoplist'][0][-1])-1]+f'\n{values["ciphertext"]}')
     elif event in ['l_start', 'm_start', 'r_start']:
         if len(values[event]) > 0:
             if values[event][-1] not in ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
-                window[event].update(values[event][:-1])
+                window[event].update(values[event][: -1])
             elif len(values[event]) > 1:
-                window[event].update(values[event][:-1])
+                window[event].update(values[event][: -1])
             elif values[event][-1] in ('abcdefghijklmnopqrstuvwxyz'):
                 window[event].update(
                     values[event][:-1]+values[event][-1].upper())
