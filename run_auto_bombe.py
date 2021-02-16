@@ -17,9 +17,10 @@ def run(
     settings, connections, input_letter, _ = mg.get_bombe_settings()
 
     if output:
-        with open('bombe_output.txt', 'w', newline='') as file:
+        with open('bombe_output.txt', 'a', newline='') as file:
             file.write(
                 f'Rotors: {top_rotor}, {middle_rotor}, {bottom_rotor}\n')
+            file.write(f'Reflector: {reflector}\n')
             file.write(f'Plain Crib: {plain_crib}\n')
             file.write(f'Cipher Crib: {cipher_crib}\n\n')
             file.write(f'Starting Letters: {starting_letters}\n')
@@ -29,8 +30,6 @@ def run(
             for line in zipped_settings:
                 file.write(str(line)+'\n')
             file.write('\n')
-
-        input()
 
     b = Bombe(
         top_rotor,

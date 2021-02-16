@@ -28,7 +28,7 @@ if __name__ == '__main__':
                 starting_letters,
                 reflector,
                 False,
-                True
+                False
             ))
             processes.append(p)
             p.start()

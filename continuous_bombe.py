@@ -13,10 +13,13 @@ starting_letters = sys.argv[4].upper()
 
 if __name__ == '__main__':
     starttime = time.time()
+    i = 0
     rotor_combos = [
         (x, y, z) for x in ROTORS for y in ROTORS for z in ROTORS if x != y if y != z if x != z]
     for top_rotor, middle_rotor, bottom_rotor in rotor_combos:
         for reflector in REFLECTORS:
+            i += 1
+            print(i)
             run_auto_bombe.run(
                 plain_crib,
                 cipher_crib,
@@ -26,7 +29,7 @@ if __name__ == '__main__':
                 starting_letters,
                 reflector,
                 False,
-                True
+                False
             )
 
     print('That took {} seconds'.format(time.time() - starttime))

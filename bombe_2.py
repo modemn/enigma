@@ -315,7 +315,7 @@ class Bombe():
 
         if (self.output):
             with open('bombe_output.txt', 'a', newline='') as file:
-                file.write(f'End time: {end_time:0.4f}')
+                file.write(f'End time: {end_time:0.4f}\n')
 
     def auto_run(self, plain_crib, cipher_crib):
         self.crib = (plain_crib, cipher_crib)
