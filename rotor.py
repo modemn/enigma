@@ -79,6 +79,4 @@ class Rotor:
     def step(self):
         if(self.printing_enabled):
             print("Stepping rotor", self.name)
-        turnover = (self.current_letter_setting() == self.notch)
         self.pos = (self.pos+1) % 26
-        return turnover
