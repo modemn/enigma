@@ -42,11 +42,7 @@ def run_bombe(
     q.put(res)
 
 
-if __name__ == '__main__':
-    plain_crib = sys.argv[1].upper()
-    cipher_crib = sys.argv[2].upper()
-    starting_letters = sys.argv[3].upper()
-
+def run_parallel(plain_crib, cipher_crib, starting_letters):
     starttime = time.time()
     processes = []
     q = multiprocessing.Queue()
@@ -88,4 +84,18 @@ if __name__ == '__main__':
     print('That took {} seconds'.format(time.time() - starttime))
     result = []
     list(map(result.extend, rets))
+    return result
+
+
+if __name__ == '__main__':
+    plain_crib = sys.argv[1].upper()
+    cipher_crib = sys.argv[2].upper()
+    starting_letters = sys.argv[3].upper()
+
+    result = run_parallel(
+        plain_crib,
+        cipher_crib,
+        starting_letters
+    )
+
     print(result)
