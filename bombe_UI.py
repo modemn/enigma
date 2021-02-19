@@ -3,7 +3,8 @@ from enigma import Enigma
 import PySimpleGUI as sg
 from menu_generator_1 import MenuGenerator
 from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
-import run_continuous
+from multiprocessing import Process
+import run_auto_bombe
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -61,9 +62,6 @@ def make_bombe():
         [
             sg.T('Crib Index:'),
             sg.In(key='cribindex', default_text='0',
-                  enable_events=True, size=(5, 1)),
-            sg.T('Crib Length:'),
-            sg.In(key='criblen', default_text='16',
                   enable_events=True, size=(5, 1))
         ],
         [
@@ -314,7 +312,7 @@ while True:  # Event Loop
         reflector = values['bombe_reflector'].upper()
         plain_crib = values['plaincrib'].upper()
         cipher_crib = values['ciphertext'][int(values['cribindex']):int(
-            values['cribindex'])+int(values['criblen'])].upper()
+            values['cribindex'])+len(plain_crib)].upper()
 
         mg = MenuGenerator(
             plain_crib,
@@ -339,24 +337,30 @@ while True:  # Event Loop
     elif event == 'Start Bombe':
         if values['continuous']:
             print('foo')
-            # ROTORS = ['I', 'II', 'III', 'IV', 'V']
-            # REFLECTORS = ['A', 'B', 'C']
+            ROTORS = ['I', 'II', 'III', 'IV', 'V']
+            REFLECTORS = ['A', 'B', 'C']
 
-            # timer = Timer()
-            # timer.start()
+            processes = []
+            rotor_combos = [
+                (x, y, z) for x in ROTORS for y in ROTORS for z in ROTORS if x != y if y != z if x != z]
+            for top_rotor, middle_rotor, bottom_rotor in rotor_combos:
+                for reflector in REFLECTORS:
+                    p = Process(target=run_auto_bombe.run, args=(
+                        plain_crib,
+                        cipher_crib,
+                        top_rotor,
+                        middle_rotor,
+                        bottom_rotor,
+                        starting_letters,
+                        reflector,
+                        False,
+                        False
+                    ))
+                    processes.append(p)
+                    p.start()
 
-            # run_continuous.run(
-            #     ROTORS,
-            #     REFLECTORS,
-            #     starting_letters,
-            #     input_letter,
-            #     settings,
-            #     connections,
-            #     plain_crib,
-            #     cipher_crib
-            # )
-
-            # print('Total time through all rotors:', timer.stop())
+            for process in processes:
+                process.join()
         else:
             b = Bombe(
                 top_rotor,
@@ -377,8 +381,6 @@ while True:  # Event Loop
             window['stoplist'].update(values=stoplist)
     elif event == 'cribindex' and values['cribindex'][-1] not in ('0123456789'):
         window['cribindex'].update(values['cribindex'][:-1])
-    elif event == 'criblen' and values['criblen'][-1] not in ('0123456789'):
-        window['criblen'].update(values['criblen'][:-1])
     elif event == 'stoplist' and values['stoplist']:
         window['bombe_output'].update(stops[int(values['stoplist'][0][-1])-1])
         window['View on Enigma'].update(visible=True)
