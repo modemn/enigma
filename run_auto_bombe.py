@@ -44,7 +44,7 @@ def run(
         output
     )
 
-    b.auto_run(plain_crib, cipher_crib)
+    return b.auto_run(plain_crib, cipher_crib)
 
 
 if __name__ == '__main__':

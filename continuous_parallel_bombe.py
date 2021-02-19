@@ -5,8 +5,7 @@ import sys
 import time
 
 ROTORS = ['I', 'II', 'III', 'IV', 'V']
-# REFLECTORS = ['A', 'B', 'C']
-REFLECTORS = ['B']
+REFLECTORS = ['A', 'B', 'C']
 
 
 def run_bombe(

@@ -4,7 +4,7 @@ from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
 
 input_column = [
     [sg.Text(text='Input:')],
-    [sg.Multiline(size=(50, 10), key='enigma_input')]
+    [sg.Multiline(size=(50, 10), key='enigma_input', enable_events=True)]
 ]
 
 rotor_l = [
@@ -158,34 +158,34 @@ while True:  # Event Loop
 
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
-    elif event == 'Encrypt':
-        e = Enigma(
-            False,
-            values['monitor'],
-            True,
-            [
-                values['l_rotor'],
-                values['m_rotor'],
-                values['r_rotor'],
-            ],
-            [
-                values['l_start'].upper(),
-                values['m_start'].upper(),
-                values['r_start'].upper(),
-            ],
-            [
-                str(values['l_ring']),
-                str(values['m_ring']),
-                str(values['r_ring']),
-            ],
-            str(values['reflector']),
-            values['steckers'].upper().split()
-        )
+    # elif event == 'Encrypt':
+    #     e = Enigma(
+    #         False,
+    #         values['monitor'],
+    #         True,
+    #         [
+    #             values['l_rotor'],
+    #             values['m_rotor'],
+    #             values['r_rotor'],
+    #         ],
+    #         [
+    #             values['l_start'].upper(),
+    #             values['m_start'].upper(),
+    #             values['r_start'].upper(),
+    #         ],
+    #         [
+    #             str(values['l_ring']),
+    #             str(values['m_ring']),
+    #             str(values['r_ring']),
+    #         ],
+    #         str(values['reflector']),
+    #         values['steckers'].upper().split()
+    #     )
 
-        cipher_text = e.encrypt(values['enigma_input'][:-1].upper())
-        # change the "output" element to be the value of "input" element
-        window['enigma_output'].update('')
-        window['enigma_output'].update(cipher_text)
+    #     cipher_text = e.encrypt(values['enigma_input'][:-1].upper())
+    #     # change the "output" element to be the value of "input" element
+    #     window['enigma_output'].update('')
+    #     window['enigma_output'].update(cipher_text)
     elif event in ['l_start', 'm_start', 'r_start']:
         if len(values[event]) > 0:
             if values[event][-1] not in ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
@@ -199,5 +199,37 @@ while True:  # Event Loop
         if len(values[event]) > 0:
             if values[event] not in [str(x) for x in range(1, 27)]:
                 window[event].update(values[event][:-1])
+    elif event == 'enigma_input':
+        if values['enigma_input'][-1] not in ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
+            window['enigma_input'].update(values['enigma_input'][:-1])
+        else:
+            e = Enigma(
+                False,
+                values['monitor'],
+                True,
+                [
+                    values['l_rotor'],
+                    values['m_rotor'],
+                    values['r_rotor'],
+                ],
+                [
+                    values['l_start'].upper(),
+                    values['m_start'].upper(),
+                    values['r_start'].upper(),
+                ],
+                [
+                    str(values['l_ring']),
+                    str(values['m_ring']),
+                    str(values['r_ring']),
+                ],
+                str(values['reflector']),
+                values['steckers'].upper().split()
+            )
+
+        cipher_text = e.encrypt(values['enigma_input'][:-1].upper())
+        # change the "output" element to be the value of "input" element
+        window['enigma_output'].update('')
+        window['enigma_output'].update(cipher_text)
+
 
 window.close()
