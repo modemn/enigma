@@ -49,7 +49,7 @@ class Enigma():
         self.plugboard = Plugboard(self.printing_enabled, letter_swaps)
 
         if (self.output_enabled):
-            with open('start_settings.txt', 'w') as writer:
+            with open('enigma_output.txt', 'w') as writer:
                 writer.writelines('Stepping Enabled:' +
                                   str(stepping_enabled)+'\n')
                 writer.writelines('Rotors:'+str(rotors)+'\n')
@@ -112,7 +112,7 @@ class Enigma():
             ciphertext += cipherletter
 
         if(self.output_enabled):
-            with open('start_settings.txt', 'a+') as writer:
+            with open('enigma_output.txt', 'a+') as writer:
                 writer.write('Plaintext:'+plaintext+'\n')
                 writer.write('Ciphertext:'+ciphertext+'\n')
 

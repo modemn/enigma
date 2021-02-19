@@ -128,10 +128,10 @@ rotor_column = [
     [
         sg.Checkbox('Monitor', k='monitor', enable_events=True, default=False),
         sg.Check('Live Encrypt', k='live_encrypt',
-                 enable_events=True, default=True),
-        sg.Check('Output to file')
+                 enable_events=True, default=True)
     ],
-    [sg.B('Encrypt', visible=False)]
+    [sg.Column([[sg.B('Encrypt'), sg.Check('Output to file',
+                                           k='file_output')]], visible=False, k='encrypt_row')]
 ]
 
 
@@ -164,7 +164,7 @@ window = sg.Window("Enigma Machine", layout)
 while True:  # Event Loop
     event, values = window.read()
     window['mc'].update(visible=values['monitor'])
-    window['Encrypt'].update(visible=not values['live_encrypt'])
+    window['encrypt_row'].update(visible=not values['live_encrypt'])
     window['monitor_output'].update(
         '' if len(values['enigma_input']) == 1 else None)
     window['enigma_output'].update(
@@ -252,7 +252,7 @@ while True:  # Event Loop
                 values['r_start'].upper(),
             ]
             e = Enigma(
-                False,
+                values['file_output'],
                 values['monitor'],
                 True,
                 [
