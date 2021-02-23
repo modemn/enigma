@@ -6,17 +6,70 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Enigma():
+    """A class to represent and Enigma machine based on the Enigma M3.
+
+    Attributes
+    ----------
+    output_enabled: bool 
+        Determines whether to output a file named 'enigma_output.txt'.
+    printing_enabled: bool
+        Determines whether to print scrambling steps to the terminal.
+    stepping_enabled: bool
+        Determines whether to step the rotors after each letter encryption.
+    starting_letters: list[str]
+        The letters to start each rotor on. Rightmost rotor's letter specified first.
+    l_rotor: Rotor
+        The leftmost rotor.
+    m_rotor: Rotor
+        The middle rotor.
+    r_rotor: Rotor
+        The righmost rotor.
+    reflector: Reflector
+        The reflector.
+    plugboard: Plugboard
+        The plugboard.
+
+    Methods
+    -------
+    step_rotors(from_bombe)
+        Steps the rotors.
+    encrypt(plaintext)
+        Encrypts or decrypts the text through the Enigma.
+    to_string()
+        Contructs a string representation of the settings of the Enigma.
+    """
+
     def __init__(
         self,
-        output,
-        printing,
-        stepping_enabled,
-        rotors,
-        starting_letters,
-        ring_settings,
-        reflector,
-        letter_swaps
+        output: bool,
+        printing: bool,
+        stepping_enabled: bool,
+        rotors: list[str],
+        starting_letters: list[str],
+        ring_settings: list[str],
+        reflector: str,
+        letter_swaps: list[str]
     ):
+        """
+        Parameters
+        ----------
+        output: bool
+            Determines whether to output a file named 'enigma_output.txt'.
+        printing: bool
+            Determines whether to print scrambling steps to the terminal.
+        stepping_enabled: bool
+            Determines whether to step the rotors after each letter encryption.
+        rotors: list[str]
+            The names of the rotors to use. Rightmost rotor specified first.
+        starting_letters: list[str]
+            The letters to start each rotor on. Rightmost rotor's letter specified first.
+        ring_settings: list[str]
+            The number of letters to set the ring settings to. Rightmost rotor's ring setting specified first.
+        reflector: str
+            The name of the reflector to use.
+        letter_swaps: list[str]
+            The pairs of swapped letters.
+        """
 
         self.output_enabled = output
         self.printing_enabled = printing
@@ -58,7 +111,20 @@ class Enigma():
                 writer.writelines('Reflector:'+str(reflector)+'\n')
                 writer.writelines('Plugboard:'+str(letter_swaps)+'\n')
 
-    def step_rotors(self, from_bombe):
+    def step_rotors(self, from_bombe: bool):
+        """Steps the rotors.
+
+        If the argument from_bombe is True, the stepping is done without regard for notches. Also prints the route if printing_enabled is True.
+
+        Parameters
+        ----------
+        from_bombe: bool 
+            Whether the instruction for stepping has come from a Bombe or this Enigma.
+
+        Returns
+        -------
+        None
+        """
         if (not from_bombe):
             r_notched = (self.r_rotor.current_letter_setting()
                          == self.r_rotor.notch)
@@ -83,7 +149,21 @@ class Enigma():
             print('Current rotor setting:', self.l_rotor.current_letter_setting(
             ), self.m_rotor.current_letter_setting(), self.r_rotor.current_letter_setting())
 
-    def encrypt(self, plaintext):
+    def encrypt(self, plaintext: str):
+        """Encrypts or decrypts the text through the Enigma.
+
+        Although named 'encrypt', this method can be used to decrypt too since the operations are identical. Also prints the plain and cipher letter output if printing_enabled is True. Also outputs the plain and cipher text to a file if output_enabled is True.
+
+        Parameters
+        ----------
+        plaintext: str
+            The text to encrypt or decrypt
+
+        Returns
+        -------
+        ciphertext: str
+            The text after encryption or decryption of the plaintext.
+        """
         if(self.printing_enabled):
             print()
             print()
@@ -119,6 +199,17 @@ class Enigma():
         return ciphertext
 
     def to_string(self):
+        """Contructs a string representation of the settings of the Enigma.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        output: str
+            A string of the rotors, reflector and plugboard settings of the Enigma.
+        """
         output = ''
         output += 'Left Rotor: '+self.l_rotor.name + ' ' + \
             self.l_rotor.current_letter_setting()+' '+str(self.l_rotor.ring_setting)+'\n'
