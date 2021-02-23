@@ -192,33 +192,34 @@ class MenuGenerator:
             return [], [], '!', -1
 
 
-# kina jr
-# print('Plain crib:')
-# plain_crib = input().replace(" ", "").upper()
-plain_crib = 'WETTERVORHERSAGE'
-# plain_crib = 'WETTERVORHERSAG'
-# plain_crib = 'TAETIGKEITSBERIQTVOM'
-# plain_crib = 'ORSITAMETC'
-# 111111111111111111111111111111111111111111111
-# plain_crib = 'ABCDADEGFHHI'
+if __name__ == '__main__':
+    # kina jr
+    # print('Plain crib:')
+    # plain_crib = input().replace(" ", "").upper()
+    plain_crib = 'WETTERVORHERSAGE'
+    # plain_crib = 'WETTERVORHERSAG'
+    # plain_crib = 'TAETIGKEITSBERIQTVOM'
+    # plain_crib = 'ORSITAMETC'
+    # 111111111111111111111111111111111111111111111
+    # plain_crib = 'ABCDADEGFHHI'
 
-# print('Cipher crib:')
-# cipher_crib = input().replace(" ", "").upper()
-cipher_crib = 'SNMKGGSTZZUGARLV'
-# cipher_crib = 'SNMKGGSTZZUGARL'
-# cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
-# cipher_crib = 'YITCWTUWRT'
-# 111111111111111111111111111111111111111111111
-# cipher_crib = 'BCDBEFGFHIJJ'
+    # print('Cipher crib:')
+    # cipher_crib = input().replace(" ", "").upper()
+    cipher_crib = 'SNMKGGSTZZUGARLV'
+    # cipher_crib = 'SNMKGGSTZZUGARL'
+    # cipher_crib = 'YMZAXOZBCWGZFIGIMWXQ'
+    # cipher_crib = 'YITCWTUWRT'
+    # 111111111111111111111111111111111111111111111
+    # cipher_crib = 'BCDBEFGFHIJJ'
 
-# print('Starting letters:')
-# starting_letters = input().replace(" ", "").upper()
-starting_letters = 'ZZZ'
+    # print('Starting letters:')
+    # starting_letters = input().replace(" ", "").upper()
+    starting_letters = 'ZZZ'
 
-# assert len(starting_letters) == 3, 'There should be 3 starting letters!'
-# assert len(plain_crib) == len(
-#     cipher_crib), 'The cipher and plain cribs should be of the same length'
+    # assert len(starting_letters) == 3, 'There should be 3 starting letters!'
+    # assert len(plain_crib) == len(
+    #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-# mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-# pprint(mg.get_bombe_settings())
-# mg.draw_menu()
+    # mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+    # pprint(mg.get_bombe_settings())
+    # mg.draw_menu()
