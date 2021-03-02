@@ -127,9 +127,9 @@ class Enigma():
         """
         if (not from_bombe):
             r_notched = (self.r_rotor.current_letter_setting()
-                         == self.r_rotor.notch)
+                         in list(self.r_rotor.notch))
             m_notched = (self.m_rotor.current_letter_setting()
-                         == self.m_rotor.notch)
+                         in list(self.m_rotor.notch))
 
             self.r_rotor.step()
 
