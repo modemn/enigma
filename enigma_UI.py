@@ -1,6 +1,11 @@
 from enigma import Enigma
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
+from rotor import ROTOR_DICT
+from reflector import REFLECTOR_DICT
+
+ROTORS = list(ROTOR_DICT.keys())
+REFLECTORS = list(REFLECTOR_DICT.keys())
 
 rotor_history = []
 prev_input_length = 1
@@ -13,7 +18,7 @@ input_column = [
 
 rotor_l = [
     [sg.Combo(
-        ['I', 'II', 'III', 'IV', 'V'],
+        ROTORS,
         'I',
         tooltip='Rotor Name',
         size=(6, 1),
@@ -43,7 +48,7 @@ rotor_l = [
 
 rotor_m = [
     [sg.Combo(
-        ['I', 'II', 'III', 'IV', 'V'],
+        ROTORS,
         'II',
         tooltip='Rotor Name',
         size=(6, 1),
@@ -72,7 +77,7 @@ rotor_m = [
 
 rotor_r = [
     [sg.Combo(
-        ['I', 'II', 'III', 'IV', 'V'],
+        ROTORS,
         'III',
         tooltip='Rotor Name',
         size=(6, 1),
@@ -102,7 +107,7 @@ rotor_r = [
 reflector = [
     [
         sg.Combo(
-            ['A', 'B', 'C'],
+            REFLECTORS,
             'B',
             tooltip='Reflector',
             size=(6, 1),
