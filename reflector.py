@@ -1,4 +1,4 @@
-reflector_dict = {
+REFLECTOR_DICT = {
     'A': {'name': 'A',
           'output': 'EJMZALYXVBWFCRQUONTSPIKHGD'},
     'B': {'name': 'B',
@@ -11,7 +11,7 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 def get_reflector_choices():
-    return list(reflector_dict.keys())
+    return list(REFLECTOR_DICT.keys())
 
 
 class Reflector:
@@ -43,8 +43,8 @@ class Reflector:
         printing: bool
             Determines whether to print the scrambling route to the terminal.
         """
-        self.name = reflector_dict[model]['name']
-        self.output = reflector_dict[model]['output']
+        self.name = REFLECTOR_DICT[model]['name']
+        self.output = REFLECTOR_DICT[model]['output']
         self.printing = printing
 
     def reflect(self, input):
