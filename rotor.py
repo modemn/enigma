@@ -23,6 +23,21 @@ ROTOR_DICT = {
         'name': 'V',
         'output': 'VZBRGITYUPSDNHLXAWMJQOFECK',
         'notch': 'Z'
+    },
+    'VI': {
+        'name': 'VI',
+        'output': 'JPGVOUMFYQBENHZRDKASXLICTW',
+        'notch': 'ZM'
+    },
+    'VII': {
+        'name': 'VII',
+        'output': 'NZJHGRCXMYSWBOUFAIVLPEKQDT',
+        'notch': 'ZM'
+    },
+    'VIII': {
+        'name': 'VII',
+        'output': 'FKQHTLXOCBJSPDZRAMEWNIUYGV',
+        'notch': 'ZM'
     }
 }
 
@@ -35,8 +50,6 @@ def get_rotor_choices():
 
 class Rotor:
     """A class to represnt a single rotor in the Engima machine.
-
-    There are 5 rotors currently defined - {I, II, III, IV, V}
 
     Attributes
     ----------
