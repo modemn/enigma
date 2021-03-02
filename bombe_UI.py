@@ -1,13 +1,15 @@
 from bombe_2 import Bombe
 from enigma import Enigma
-import PySimpleGUI as sg
+from rotor import ROTOR_DICT
+from reflector import REFLECTOR_DICT
 from menu_generator_1 import MenuGenerator
 from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
 import continuous_parallel_bombe
+import PySimpleGUI as sg
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-ROTORS = ['I', 'II', 'III', 'IV', 'V']
-REFLECTORS = ['A', 'B', 'C']
+ROTORS = list(ROTOR_DICT.keys())
+REFLECTORS = list(REFLECTOR_DICT.keys())
 
 if __name__ == '__main__':
     def run_bombe(
