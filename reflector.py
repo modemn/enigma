@@ -10,10 +10,6 @@ REFLECTOR_DICT = {
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
-def get_reflector_choices():
-    return list(REFLECTOR_DICT.keys())
-
-
 class Reflector:
     """A class to represent a reflector in the Engima machine.
 

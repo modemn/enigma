@@ -133,7 +133,8 @@ rotor_column = [
     [
         sg.Checkbox('Monitor', k='monitor', enable_events=True, default=False),
         sg.Check('Live Encrypt', k='live_encrypt',
-                 enable_events=True, default=True)
+                 enable_events=True, default=True),
+        sg.B('Reset Enigma')
     ],
     [sg.Column([[sg.B('Encrypt'), sg.Check('Output to file',
                                            k='file_output')]], visible=False, k='encrypt_row')]
@@ -287,5 +288,20 @@ while True:  # Event Loop
             window['r_start'].update(e.r_rotor.current_letter_setting())
         else:
             window['enigma_input'].update(values['enigma_input'][:-2])
+    elif event == 'Reset Enigma':
+        window['enigma_input'].update('')
+        window['reflector'].update('B')
+        window['l_rotor'].update('I')
+        window['m_rotor'].update('II')
+        window['r_rotor'].update('III')
+        window['l_start'].update('A')
+        window['m_start'].update('A')
+        window['r_start'].update('A')
+        window['l_ring'].update('1')
+        window['m_ring'].update('1')
+        window['r_ring'].update('1')
+        window['steckers'].update('')
+        window['enigma_output'].update('')
+        window['monitor_output'].update('')
 
 window.close()

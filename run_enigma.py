@@ -66,7 +66,7 @@ if(len(choice) == 0):
 else:
     ring_settings = choice.split()
 
-all_reflector_choices = reflector.get_reflector_choices()
+all_reflector_choices = list(reflector.REFLECTOR_DICT.keys())
 print()
 print()
 print(
