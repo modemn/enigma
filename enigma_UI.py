@@ -1,4 +1,4 @@
-from enigma import Enigma
+from enigma import ALPHABET, Enigma
 import PySimpleGUI as sg
 from PySimpleGUI.PySimpleGUI import RELIEF_GROOVE, TEXT_LOCATION_CENTER
 from rotor import ROTOR_DICT
@@ -41,7 +41,8 @@ rotor_l = [
             size=(3, 1),
             key='l_ring',
             enable_events=True
-        )
+        ),
+        sg.T('A', k='l_ring_letter')
     ]
 ]
 
@@ -71,7 +72,8 @@ rotor_m = [
             size=(3, 1),
             key='m_ring',
             enable_events=True
-        )
+        ),
+        sg.T('A', k='m_ring_letter')
     ]
 ]
 
@@ -100,7 +102,8 @@ rotor_r = [
             size=(3, 1),
             key='r_ring',
             enable_events=True
-        )
+        ),
+        sg.T('A', k='r_ring_letter')
     ]
 ]
 
@@ -191,6 +194,9 @@ while True:  # Event Loop
         if len(values[event]) > 0:
             if values[event] not in [str(x) for x in range(1, 27)]:
                 window[event].update(values[event][:-1])
+            else:
+                window[event+'_letter'].update(
+                    '' if len(values[event]) == 0 else ALPHABET[int(values[event])-1])
     elif event == 'enigma_input':
         if values['live_encrypt']:
             if (len(values['enigma_input']) < prev_input_length):
