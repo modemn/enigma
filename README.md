@@ -33,21 +33,21 @@ python enigma_UI.py
 
 ## Bombe Simulator
 
-Run the command line version of the Enigma simulator with:
+Run the command line version of the Bombe simulator with:
 
 ```
 python bombe.py
 ```
 
-This allows you to set up an Enigma from the command line, run an Enigma from a file or run a random Enigma.
+This allows you to set up an Bombe machine from the scratch, run a Bombe machine with automatic settings generated and run a Bombe machine in continuous mode.
 
-There is also the option to run the Enigma simulator through a GUI with:
+There is also the option to run the Bombe simulator through a GUI with:
 
 ```
 python bombe_UI.py
 ```
 
-![Bombe UI]()
+![Bombe UI](https://github.com/modemn/enigma/blob/master/Bombe.png)
 
 ## Acknowledgments
 
