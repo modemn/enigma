@@ -1,8 +1,6 @@
 from enigma import Enigma
 from indicator import Indicator
 from timer import Timer
-from pprint import pprint
-import csv
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 

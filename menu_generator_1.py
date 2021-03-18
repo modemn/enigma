@@ -4,6 +4,8 @@ import math
 import random
 from pprint import pprint
 
+from networkx.drawing import layout
+
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
@@ -34,6 +36,7 @@ class MenuGenerator:
             label = ALPHABET[top_idx]+ALPHABET[middle_idx]+ALPHABET[bottom_idx]
 
             self.edge_labels[connections[i]] = label
+            # self.edge_labels[connections[i]] = i+1
 
         self.menu.add_edges_from(connections)
 
@@ -42,12 +45,12 @@ class MenuGenerator:
 
         plt.figure()
 
-        nx.draw(self.menu, pos, edge_color='black', width=1, linewidths=1,
-                node_size=200, node_color='red', alpha=0.9,
+        nx.draw(self.menu, pos, edge_color='black', width=2,
+                node_size=500, node_color='black', font_color='white', font_weight='bold',
                 labels={node: node for node in self.menu.nodes()})
 
         nx.draw_networkx_edge_labels(
-            self.menu, pos, edge_labels=self.edge_labels, font_color='black')
+            self.menu, pos, edge_labels=self.edge_labels, font_color='black', font_size=12, bbox=dict(boxstyle='square', fc="w", ec="k"))
 
         plt.axis('off')
         plt.show()
@@ -220,6 +223,6 @@ if __name__ == '__main__':
     # assert len(plain_crib) == len(
     #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
-    # mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-    # pprint(mg.get_bombe_settings())
-    # mg.draw_menu()
+    mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
+    pprint(mg.get_bombe_settings())
+    mg.draw_menu()
