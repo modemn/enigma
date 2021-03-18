@@ -29,7 +29,7 @@ There is also the option to run the Enigma simulator through a GUI with:
 python enigma_UI.py
 ```
 
-![Enigma UI](https://github.com/modemn/enigma/blob/master/Enigma.png)
+![Enigma UI](https://github.com/modemn/enigma/blob/master/Enigma.png =250x)
 
 ## Bombe Simulator
 
@@ -47,7 +47,7 @@ There is also the option to run the Bombe simulator through a GUI with:
 python bombe_UI.py
 ```
 
-![Bombe UI](https://github.com/modemn/enigma/blob/master/Bombe.png)
+![Bombe UI](https://github.com/modemn/enigma/blob/master/Bombe.png =250x)
 
 ## Acknowledgments
 
