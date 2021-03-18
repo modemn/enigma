@@ -147,27 +147,6 @@ class Bombe():
         # and a stop hasn't occurred
         while ((iteration < 17576)):
 
-            # if self.printing:
-            #     top_row = ''
-            #     middle_row = ''
-            #     bottom_row = ''
-
-            #     for scrambler in self.scramblers:
-            #         top_row += str(scrambler.l_rotor.current_letter_setting())
-            #         middle_row += str(scrambler.m_rotor.current_letter_setting())
-            #         bottom_row += str(scrambler.r_rotor.current_letter_setting())
-
-            #     top_row += ' '+str(self.indicator.t_rotor.current_letter())
-            #     middle_row += ' '+str(self.indicator.m_rotor.current_letter())
-            #     bottom_row += ' '+str(self.indicator.b_rotor.current_letter())
-
-            #     print(iteration, '----------------------------------')
-            #     print('Scrambler settings:')
-            #     print(top_row)
-            #     print(middle_row)
-            #     print(bottom_row)
-            #     print()
-
             # Intialize dictionary keeping track of visited nodes
             visited = {}
             for i in list(self.menu.keys()):

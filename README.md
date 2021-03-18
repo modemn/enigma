@@ -8,10 +8,9 @@ Simulating the machines will not only allow users to learn about their design bu
 
 ## Prerequisites
 
-This is required to run the GUI for both simulators
-
 ```
 pip install PySimpleGUI
+pip install termcolor
 ```
 
 ## Enigma Simulator
