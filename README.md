@@ -15,7 +15,39 @@ pip install termcolor
 
 ## Enigma Simulator
 
+Run the command line version of the Enigma simulator with:
+
+```
+python enigma.py
+```
+
+This allows you to set up an Enigma from the command line, run an Enigma from a file or run a random Enigma.
+
+There is also the option to run the Enigma simulator through a GUI with:
+
+```
+python enigma_UI.py
+```
+
+![Enigma UI](https://github.com/modemn/enigma/blob/master/Enigma.png)
+
 ## Bombe Simulator
+
+Run the command line version of the Enigma simulator with:
+
+```
+python bombe.py
+```
+
+This allows you to set up an Enigma from the command line, run an Enigma from a file or run a random Enigma.
+
+There is also the option to run the Enigma simulator through a GUI with:
+
+```
+python bombe_UI.py
+```
+
+![Bombe UI]()
 
 ## Acknowledgments
 
