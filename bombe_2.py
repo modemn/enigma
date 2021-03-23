@@ -135,6 +135,16 @@ class Bombe():
         self.num_stops = 0
         self.printing = printing
         self.output = output
+        if self.output:
+            settings = list(zip(scrambler_settings, connections))
+            with open('bombe_output.txt', 'w', newline='') as file:
+                file.write(
+                    f'Rotors: {self.l_rotor}, {self.m_rotor}, {self.r_rotor}\n')
+                file.write(f'Reflector: {self.reflector}\n\n')
+                file.write('Connections:\n')
+                for s in settings:
+                    file.write(f'{s}\n')
+                file.write('\n')
         self.crib = ()
 
     def run(self):
@@ -226,7 +236,7 @@ class Bombe():
                             )
 
                             stop_encryption = stop_enigma.encrypt(
-                                self.crib[0])
+                                self.crib[1])
 
                         if self.printing:
                             print(
@@ -241,13 +251,13 @@ class Bombe():
                                 adjusted_starting_letters))
                             print('Possible steckers:', self.print_steckers())
                             print()
-                            if len(self.crib[0]) > 0:
+                            if len(self.crib[1]) > 0:
                                 print(
                                     '~~~~~~~~~~~~~~~~~~~~ ENCRYPTION ~~~~~~~~~~~~~~~~~~~~')
+                                print(f'{self.crib[1]} <- Cipher Crib')
                                 print(f'{self.crib[0]} <- Plain crib')
-                                print(f'{self.crib[1]} <- Actual Cipher crib')
                                 print(
-                                    f'{stop_encryption} <- Encrypted Crib with stop settings')
+                                    f'{stop_encryption} <- Decrypted Cipher Crib with stop')
                                 print()
                                 print(
                                     '######################## STOP ########################')
@@ -270,15 +280,15 @@ class Bombe():
                                     f'Possible Steckers: {self.print_steckers()}\n\n')
                                 if len(self.crib[0]) > 0:
                                     file.write(
-                                        f'{self.crib[0]} <- Plain Crib\n')
+                                        f'{self.crib[1]} <- Cipher Crib\n')
                                     file.write(
-                                        f'{self.crib[1]} <- Actual Cipher crib\n')
+                                        f'{self.crib[0]} <- Plain crib\n')
                                     file.write(
-                                        f'{stop_encryption} <- Encrypted Crib with stop settings\n\n')
+                                        f'{stop_encryption} <- Decrypted Cipher Crib with stop\n\n')
                             timer.start()
 
                         stops += [
-                            f'Rotors: {self.scramblers[0].l_rotor.name} {self.scramblers[0].m_rotor.name} {self.scramblers[0].r_rotor.name}\nReflector: {self.reflector}\nPossible ring settings: {" ".join(adjusted_ring_settings)}\nStarting Letters: {" ".join(adjusted_starting_letters)}\nPossible Steckers: {self.print_steckers()}\n{self.crib[0]} <- Plain Crib\n{self.crib[1]} <- Actual Cipher crib\n{stop_encryption} <- Encrypted Crib with stop settings'
+                            f'Rotors: {self.scramblers[0].l_rotor.name} {self.scramblers[0].m_rotor.name} {self.scramblers[0].r_rotor.name}\nReflector: {self.reflector}\nPossible ring settings: {" ".join(adjusted_ring_settings)}\nStarting Letters: {" ".join(adjusted_starting_letters)}\nPossible Steckers: {self.print_steckers()}\n{self.crib[1]} <- Cipher Crib\n{self.crib[0]} <- Plain crib\n{stop_encryption} <- Decrypted Cipher Crib with stop'
                         ]
 
             # Step scramblers

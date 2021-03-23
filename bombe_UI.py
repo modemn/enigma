@@ -157,6 +157,9 @@ if __name__ == '__main__':
                 sg.T('Invalid Settings', k='invalid_settings_error',
                      background_color='red', visible=False)
             ],
+            [
+                sg.Checkbox('Output to file', k='output')
+            ],
             [sg.T('Stops:')],
             [
                 sg.Listbox(values=stops, size=(20, 10),
@@ -320,10 +323,18 @@ if __name__ == '__main__':
         window, event, values = sg.read_all_windows()
 
         if window == bombe_window:
-            top_rotor = values['t_rotor'].upper()
-            middle_rotor = values['m_rotor'].upper()
-            bottom_rotor = values['b_rotor'].upper()
-            reflector = values['bombe_reflector'].upper()
+            window['rotors_row'].update(visible=not values['continuous'])
+            window['reflector_row'].update(visible=not values['continuous'])
+            window['continuous_error'].update(visible=values['continuous'])
+            window['Show Menu'].update(disabled=values['continuous'])
+
+        if event == sg.WIN_CLOSED or event == 'Exit':
+            window.close()
+            if window == enigma_window:       # if closing win 2, mark as closed
+                enigma_window = None
+            elif window == bombe_window:     # if closing win 1, exit program
+                break
+        elif event == 'Show Menu':
             plain_crib = values['plaincrib'].upper()
             cipher_crib = values['ciphertext'][int(values['cribindex']):int(
                 values['cribindex'])+len(plain_crib)].upper()
@@ -339,20 +350,23 @@ if __name__ == '__main__':
                 starting_letters
             )
 
-            window['rotors_row'].update(visible=not values['continuous'])
-            window['reflector_row'].update(visible=not values['continuous'])
-            window['continuous_error'].update(visible=values['continuous'])
-            window['Show Menu'].update(disabled=values['continuous'])
-
-        if event == sg.WIN_CLOSED or event == 'Exit':
-            window.close()
-            if window == enigma_window:       # if closing win 2, mark as closed
-                enigma_window = None
-            elif window == bombe_window:     # if closing win 1, exit program
-                break
-        elif event == 'Show Menu':
             mg.draw_menu()
         elif event == 'Generate Settings':
+            plain_crib = values['plaincrib'].upper()
+            cipher_crib = values['ciphertext'][int(values['cribindex']):int(
+                values['cribindex'])+len(plain_crib)].upper()
+            starting_letters = str(
+                values['sletter1'].upper() +
+                values['sletter2'].upper() +
+                values['sletter3'].upper()
+            )
+
+            mg = MenuGenerator(
+                plain_crib,
+                cipher_crib,
+                starting_letters
+            )
+
             settings, connections, input_letter, _ = mg.get_bombe_settings()
 
             if (len(settings) == 0):
@@ -369,6 +383,8 @@ if __name__ == '__main__':
                 window['stoplist'].update(values=[])
                 window['bombe_output'].update('')
         elif event == 'Start Bombe':
+
+            # Naive data validation on the settings, length is not a good way of checking this
             if (len(values['settings']) == 85 and len(values['connections']) == 73):
                 window['invalid_settings_error'].update(visible=False)
                 if values['continuous']:
@@ -379,6 +395,11 @@ if __name__ == '__main__':
                         stoplist += [f'Stop {i+1}']
                     window['stoplist'].update(values=stoplist)
                 else:
+                    top_rotor = values['t_rotor'].upper()
+                    middle_rotor = values['m_rotor'].upper()
+                    bottom_rotor = values['b_rotor'].upper()
+                    reflector = values['bombe_reflector'].upper()
+
                     b = Bombe(
                         top_rotor,
                         middle_rotor,
@@ -389,7 +410,7 @@ if __name__ == '__main__':
                         connections,
                         input_letter,
                         False,
-                        False
+                        values['output']
                     )
                     stops = b.auto_run(plain_crib, cipher_crib)
                     stoplist = []
@@ -398,15 +419,16 @@ if __name__ == '__main__':
                     window['stoplist'].update(values=stoplist)
             else:
                 window['invalid_settings_error'].update(visible=True)
-        elif event == 'cribindex' and values['cribindex'][-1] not in ('0123456789'):
-            window['cribindex'].update(values['cribindex'][:-1])
+        elif event == 'cribindex':
+            if len(values[event]) > 0 and values['cribindex'][-1] not in ('0123456789'):
+                window['cribindex'].update(values['cribindex'][:-1])
         elif event == 'stoplist' and values['stoplist']:
             window['bombe_output'].update(
                 stops[int(values['stoplist'][0][-1])-1])
             window['View on Enigma'].update(visible=True)
         elif event == 'View on Enigma' and not enigma_window:
             enigma_window = make_enigma(
-                stops[int(values['stoplist'][0][-1])-1]+f'\n{values["ciphertext"]}')
+                stops[int(values['stoplist'][0][-1])-1]+f'\n{values["ciphertext"][int(values["cribindex"]):]}')
         elif event in ['l_start', 'm_start', 'r_start']:
             if len(values[event]) > 0:
                 if values[event][-1] not in ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):
