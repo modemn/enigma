@@ -421,7 +421,7 @@ class Bombe():
 
         # Find the position in the alphabet the right hand rotor's notch is located
         one_after_notch_index = (ALPHABET.index(
-            self.scramblers[0].r_rotor.notch) + 1) % 26
+            self.scramblers[0].r_rotor.notch[0]) + 1) % 26
 
         # Step the right hand ring setting the same amount
         value = one_after_notch_index - \
