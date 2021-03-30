@@ -2,9 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import math
 import random
+import time
 from pprint import pprint
-
-from networkx.drawing import layout
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
@@ -96,7 +95,7 @@ class MenuGenerator:
                 self.scrambler_connections.append(connection)
 
     def get_bombe_settings(self):
-
+        # start_time = time.time()
         comps = nx.connected_components(self.menu)
         component_graphs = {}
         for comp in comps:
@@ -190,13 +189,14 @@ class MenuGenerator:
                                     for x in set(joined_connections))
             input_letter = max(settings_degrees, key=settings_degrees.get)
 
+            # elapsed_time = time.time() - start_time
+            # print(f'Time taken: {elapsed_time}')
             return self.scrambler_settings, self.scrambler_connections, input_letter, num_closures
         else:
             return [], [], '!', -1
 
 
 if __name__ == '__main__':
-    # kina jr
     # print('Plain crib:')
     # plain_crib = input().replace(" ", "").upper()
     plain_crib = 'WETTERVORHERSAGE'
@@ -224,5 +224,5 @@ if __name__ == '__main__':
     #     cipher_crib), 'The cipher and plain cribs should be of the same length'
 
     mg = MenuGenerator(plain_crib, cipher_crib, starting_letters)
-    pprint(mg.get_bombe_settings())
+    # mg.get_bombe_settings()
     mg.draw_menu()

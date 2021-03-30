@@ -10,7 +10,9 @@ b = Bombe(
         'ZZP', 'ZZB', 'ZZJ', 'ZZI', 'ZZL', 'ZZO'],  # SCRAMBLER SETTINGS
     ['UE', 'EG', 'GR', 'RA', 'AS', 'SV', 'VE', 'EN',
         'HZ', 'ZR', 'RG', 'GL'],  # CONNECTIONS
-    'E'  # INPUT LETTER
+    'E',  # INPUT LETTER
+    False,  # PRINTING
+    True,  # OUTPUTTING TO A FILE
 )
 
 b.run()
