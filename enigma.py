@@ -2,12 +2,13 @@ from plugboard import Plugboard
 from reflector import Reflector
 from rotor import Rotor
 from termcolor import colored
+import time
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Enigma():
-    """A class to represent and Enigma machine based on the Enigma M3.
+    """A class to represent an Enigma machine based on the Enigma M3.
 
     Attributes
     ----------
@@ -18,7 +19,7 @@ class Enigma():
     stepping_enabled: bool
         Determines whether to step the rotors after each letter encryption.
     starting_letters: list[str]
-        The letters to start each rotor on. Rightmost rotor's letter specified first.
+        The letters to start each rotor on. Leftmost rotor's letter specified first.
     l_rotor: Rotor
         The leftmost rotor.
     m_rotor: Rotor
@@ -61,13 +62,13 @@ class Enigma():
         stepping_enabled: bool
             Determines whether to step the rotors after each letter encryption.
         rotors: list[str]
-            The names of the rotors to use. Rightmost rotor specified first.
+            The names of the rotors to use. Leftmost rotor specified first.
         starting_letters: list[str]
-            The letters to start each rotor on. Rightmost rotor's letter specified first.
+            The letters to start each rotor on. Leftmost rotor's letter specified first.
         ring_settings: list[str]
-            The number of letters to set the ring settings to. Rightmost rotor's ring setting specified first.
+            The number of letters to set the ring settings to. Leftmost rotor's ring setting specified first.
         reflector: str
-            The name of the reflector to use.
+            The reflector's name.
         letter_swaps: list[str]
             The pairs of swapped letters.
         """
@@ -103,14 +104,14 @@ class Enigma():
         self.plugboard = Plugboard(self.printing_enabled, letter_swaps)
 
         if (self.output_enabled):
-            with open('enigma_output.txt', 'w') as writer:
-                writer.writelines('Stepping Enabled:' +
-                                  str(stepping_enabled)+'\n')
-                writer.writelines('Rotors:'+str(rotors)+'\n')
-                writer.writelines('Rotor Settings:'+str(starting_letters)+'\n')
-                writer.writelines('Ring Settings:'+str(ring_settings)+'\n')
-                writer.writelines('Reflector:'+str(reflector)+'\n')
-                writer.writelines('Plugboard:'+str(letter_swaps)+'\n')
+            with open('enigma_output.txt', 'w') as file:
+                file.writelines('Stepping Enabled:' +
+                                str(stepping_enabled)+'\n')
+                file.writelines('Rotors:'+str(rotors)+'\n')
+                file.writelines('Rotor Settings:'+str(starting_letters)+'\n')
+                file.writelines('Ring Settings:'+str(ring_settings)+'\n')
+                file.writelines('Reflector:'+str(reflector)+'\n')
+                file.writelines('Plugboard:'+str(letter_swaps)+'\n')
 
     def step_rotors(self, from_bombe: bool):
         """Steps the rotors.
@@ -170,6 +171,7 @@ class Enigma():
             print()
             print('ENCRYPTING...')
             print()
+        start_time = time.time()
         ciphertext = ''
         for i, plainletter in enumerate(plaintext):
             if (self.stepping_enabled):
@@ -192,10 +194,16 @@ class Enigma():
                 print()
             ciphertext += cipherletter
 
+        elapsed_time = time.time() - start_time
+
+        if (self.printing_enabled):
+            print(f'Time taken to encrypt: {elapsed_time} seconds')
+
         if(self.output_enabled):
-            with open('enigma_output.txt', 'a+') as writer:
-                writer.write('Plaintext:'+plaintext+'\n')
-                writer.write('Ciphertext:'+ciphertext+'\n')
+            with open('enigma_output.txt', 'a+') as file:
+                file.write('Plaintext:'+plaintext+'\n')
+                file.write('Ciphertext:'+ciphertext+'\n')
+                file.write(f'Time taken: {elapsed_time} seconds')
 
         return ciphertext
 
@@ -414,7 +422,8 @@ if __name__ == '__main__':
         plaintext = opts[6]
 
         enigma = Enigma(
-            False,
+            # TODO: CHANGE THIS TO FALSE AFTER EXPERIMENTS ARE DONE
+            True,
             False,
             stepping_enabled,
             rotors,
