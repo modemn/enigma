@@ -6,81 +6,114 @@ ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Bombe():
-    """ A Bombe Machine
+    """ A class to represent a Turing Bombe machine.
 
-    Creates a Bombe machine with specified rotors and settings from a menu. Using this input, a graph is made and the alphabet travserses through it in a DFS fashion. When a loop is detected, the output alphabet is checked to see if any letter has not changed, this indicates a possible consistent set of letter steckerings. The steckers are checked for consistency, and if they are found to be valid, they are saved to a full steckering.
+    Attributes
+    ----------
+    l_rotor: str
+        The top / leftmost rotor name.
+    m_rotor: str
+        The middle rotor name.
+    r_rotor: str
+        The bottom / rightmost rotor name.
+    reflector: str
+        The reflector name.
+    starting_letters: str
+        The letters the Enigma will start on. Leftmost rotor's letter specified first.
+    input: str
+        Letter to start the DFS process on.
+    scramblers: list[Enigma]
+        The scramblers.
+    indicator: Indicator
+        The indicator.
+    steckers: dict[str, str]
+        A dictionary of which letters are plugged to each other.
+    menu: dict[str, list[tuple[str, str]]]
+        The menu. The keys are node names, values are a list of tuples. The first item in the tuple is the node's neighbour. The second item in the tuple is the scrambler's starting letters associated with that connection.
+    num_stops: int
+        The number of stops.
+    printing: bool
+        Determines whether to print the scrambling steps to the terminal.
+    output: bool
+        Deteremines whether to output to a file names 'bombe_output.txt'.
+    crib: tuple[str, str]
+        The plain and cipher cribs.
 
-    Args:
-        t_rotor (str): This is the name of the top rotor (represents the leftmost rotor on the enigma) ['I', 'II', 'III', 'IV', 'V'].
-        m_rotor (str): This is the name of the middle rotor ['I', 'II', 'III', 'IV', 'V'].
-        b_rotor (str): This is the name of the bottom rotor (represents the rightmost rotor on the enigma) ['I', 'II', 'III', 'IV', 'V'].
-        indicator (str): This is the letters for the indicator drum to start with. Top rotor is the first letter and so on.
-        reflector (str): This is the name of the reflector from ['A', 'B', 'C'].
-        scrambler_settings (list(str)): This is a list of letters representing the starting letters of each scrambler in order.
-        connections (list(str)): This is a list of the letters connected to each other. Each scrambler represents a letter. This order matches the list of scramblers.
-        input (str): This is the input letters used as the source node of the DFS.
-
-    Attributes:
-        input (str): This is the input letters used as the source node of the DFS.
-        scramblers (list(Scrambler)): This is a list of scramblers using the Enigma class set with the settings given in the arguments.
-        indicator (Indicator): This is an Indicator which shows the possible ring settings at each stop.
-        steckers (dict): This is a dictionary of each letter mapped to the possible steckered letter
-        menu (dict): This is the menu graph generated from the input arguments. Keys are letters which represent nodes, values are lists of letters representing edges between nodes. Edges are between letters given as connections in the argument.
-
-    Methods:
-        run(): Runs the Bombe machine, printing out stops as and when they are found
-
-        generate_steckers(path, outputs):
-            Generates a steckering dictionary given the path and list of outputs
-            Args:
-                path (str): Letters representing which nodes the alphabet has traversed through
-                outputs (list(str)): The output from each scrambler the alphabet has traversed through
-
-        check_steckers(steckers):
-            Checks the conisitency of a given steckering
-            Args:
-                steckers (dict): A dictionary of each letter mapped to the possible steckered letter.
-            Returns:
-                (bool): Whether the steckers given were consistent or not
-
-        dfs(v, parent, visited, path, dfs_tree_paths, to_scramble):
-            A recursive function to traverse the menu and push the alphabet through each eage
-            Args:
-                v (str): The current node in the traversal
-                visited (list(bool)): List of booleans, ith bool represents the ith node visited status.
-                path (str): A string of letters representing the path traversed prior to arriving at the current node, v.
-                dfs_tree_paths (dict): A dictionary holding all paths and a list of the outputs after each traversal of that path.
-                to_scramble (str): The string of letters to input into the next edge to receive the output scrambled output. This starts of as the usual alphabet.
-
-        scramble(starting_letters, input):
-            Scrambles the given input through the scramblers whose starting letters are the ones given.
-            Args:
-                starting_letters (str): The letters given as the starting letters of the scrmabler that the input should be scrambled through
-                input (str): The string to scrambler through the given scrambler
-            Returns:
-                (str): The output of the scrambler.
-
+    Methods
+    -------
+    run()
+        Runs the bombe.
+    auto_run(plain_crib, cipher_crib)
+        Sets the crib tuple attribute and then runs the bombe.
+    generate_steckers(path, outputs, consistent_letter)
+        Generates the steckers given the outputs of each stage of the DFS process and the letter that stayed consistent.
+    check_steckers(steckers)
+        Checks to see if the steckers given are valid ie each key has one unique letter value.
+    dfs(v, parent, visited, path, dfs_tree_paths, to_scramble)
+        Traverses the menu and scrambles through each stage and saves the output.
+    scramble(starting_letters, input_str)
+        Scrambles the input through and Enigma with the starting letters provided.
+    print_steckers()
+        Prints the steckers.
+    adjust_ring_start_letters()
+        Adjusts the ring setting so that they are as far as possible from a middle rotor shift.
     """
 
-    def __init__(self, t_rotor, m_rotor, b_rotor, indicator, reflector, scrambler_settings, connections, input_letter, printing, output):
-        # Store rotors for outputting at a stop
+    def __init__(
+        self,
+        t_rotor: str,
+        m_rotor: str,
+        b_rotor: str,
+        indicator: str,
+        reflector: str,
+        scrambler_settings: list[str],
+        connections: list[str],
+        input_letter: str,
+        printing: bool,
+        output: bool
+    ):
+        """
+        Parameters
+        ----------
+        t_rotor: str
+            The top / leftmost rotor's name.
+        m_rotor: str
+            The middle rotor's name.
+        b_rotor: str
+            The bottom / rightmost rotor's name.
+        indicator: str
+            The letters to start the Inidicator with, translates to the ring settings that the Enigma will start with.
+        reflector: str
+            The reflector's name.
+        scrambler_settings: list[str]
+            The starting letters of each scrambler.
+        connections: list[str]
+            Pairs of letters representing which pairs of scramblers connect.
+        input_letter: str
+            The letter to start the DFS process on.
+        printing: bool
+            Determines whether to print the scrambling steps to the terminal.
+        output: bool
+            Deteremines whether to output to a file names 'bombe_output.txt'.
+        """
         self.l_rotor = t_rotor
         self.m_rotor = m_rotor
         self.r_rotor = b_rotor
-
-        # Store the reflector for outputting encoding
         self.reflector = reflector
+        self.starting_letters: str = ''
+        self.input = input_letter
+        self.scramblers: list[Enigma] = []
+        self.indicator = Indicator([indicator[0], indicator[1], indicator[2]])
+        self.steckers: dict[str, str] = {}
+        self.menu: dict[str, list[tuple[str, str]]] = {}
+        self.num_stops: int = 0
+        self.printing = printing
+        self.output = output
+        self.crib: tuple[str, str] = ()
 
-        # Calculate what the starting letter should really be for outputting at a stop
-        self.starting_letters = ''
         for letter in indicator:
             self.starting_letters += ALPHABET[ALPHABET.find(letter)-1]
 
-        # Initialize the input letter to DFS with as the source node
-        self.input = input_letter
-
-        # Initialize scramblers
-        self.scramblers = []
         for i in range(len(scrambler_settings)):
             self.scramblers.append(
                 Enigma(
@@ -94,47 +127,27 @@ class Bombe():
                     []
                 )
             )
-
-        # Initialize indicator scrambler
-        self.indicator = Indicator([indicator[0], indicator[1], indicator[2]])
-
-        # Initialize possible stecker dictionary
-        self.steckers = {}
         for letter in ALPHABET:
             self.steckers[letter] = ''
-
-        # Initialize the menu graph
-        self.menu = {}
         all_connections = ''
+
         for connection in connections:
             all_connections += connection
-
-        # Get all the menu nodes from the unique letters in all the connections
         nodes = "".join(set(all_connections))
+
         for node in nodes:
             self.menu[node] = []
 
-        # Construct the menu
         for i in range(len(connections)):
-
-            # Create the forward and backward edge tuples, both edges
-            # to make the menu undirected
-            # The first item in the tuple is this node's neighbour
-            # The second item in the tuple is the scrambler's starting letters
-            # associated with that connection (edge labels)
             forward_edge = (connections[i][1], scrambler_settings[i])
             backward_edge = (connections[i][0], scrambler_settings[i])
 
-            # Add both edges to the menu if it doesn't already exist
             if forward_edge not in self.menu[connections[i][0]]:
                 self.menu[connections[i][0]].append(forward_edge)
 
             if backward_edge not in self.menu[connections[i][1]]:
                 self.menu[connections[i][1]].append(backward_edge)
 
-        self.num_stops = 0
-        self.printing = printing
-        self.output = output
         if self.output:
             settings = list(zip(scrambler_settings, connections))
             with open('bombe_output.txt', 'w', newline='') as file:
@@ -145,9 +158,21 @@ class Bombe():
                 for s in settings:
                     file.write(f'{s}\n')
                 file.write('\n')
-        self.crib = ()
 
     def run(self):
+        """Runs the Bombe simulator.
+
+        Tries to find stops given the scrambler settings and the menu. Prints each stop's information if printing is True and outputs them to a file called 'bombe_output.txt' if output is True.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        stops: list[str]
+            A list of strings each containing information of all the stops found.
+        """
         timer = Timer()
         timer.start()
         iteration = 0
@@ -214,9 +239,10 @@ class Bombe():
                     if (self.check_steckers(self.steckers) and valid_stop):
                         time = timer.stop()
 
+                        adjusted_ring_settings, adjusted_starting_letters = self.adjust_ring_start_letters()
+
                         # If we got given a plain_crib then set up an enigma machine and encode with settings from the stop
-                        if len(self.crib[0]) > 0:
-                            adjusted_ring_settings, adjusted_starting_letters = self.adjust_ring_start_letters()
+                        if len(self.crib) > 0:
 
                             enigma_steckers = []
                             for s in self.steckers.keys():
@@ -278,7 +304,7 @@ class Bombe():
                                     f'Starting Letters: {" ".join(adjusted_starting_letters)}\n')
                                 file.write(
                                     f'Possible Steckers: {self.print_steckers()}\n\n')
-                                if len(self.crib[0]) > 0:
+                                if len(self.crib) > 0:
                                     file.write(
                                         f'{self.crib[1]} <- Cipher Crib\n')
                                     file.write(
@@ -287,9 +313,12 @@ class Bombe():
                                         f'{stop_encryption} <- Decrypted Cipher Crib with stop\n\n')
                             timer.start()
 
-                        stops += [
-                            f'Rotors: {self.scramblers[0].l_rotor.name} {self.scramblers[0].m_rotor.name} {self.scramblers[0].r_rotor.name}\nReflector: {self.reflector}\nPossible ring settings: {" ".join(adjusted_ring_settings)}\nStarting Letters: {" ".join(adjusted_starting_letters)}\nPossible Steckers: {self.print_steckers()}\n{self.crib[1]} <- Cipher Crib\n{self.crib[0]} <- Plain crib\n{stop_encryption} <- Decrypted Cipher Crib with stop'
-                        ]
+                        this_stop = f'Rotors: {self.scramblers[0].l_rotor.name} {self.scramblers[0].m_rotor.name} {self.scramblers[0].r_rotor.name}\nReflector: {self.reflector}\nPossible ring settings: {" ".join(adjusted_ring_settings)}\nStarting Letters: {" ".join(adjusted_starting_letters)}\nPossible Steckers: {self.print_steckers()}'
+
+                        if len(self.crib) > 0:
+                            this_stop += f'\n{self.crib[1]} <- Cipher Crib\n{self.crib[0]} <- Plain crib\n{stop_encryption} <- Decrypted Cipher Crib with stop'
+
+                        stops += [this_stop]
 
             # Step scramblers
             for scrambler in self.scramblers:
@@ -311,12 +340,41 @@ class Bombe():
 
         return stops
 
-    def auto_run(self, plain_crib, cipher_crib):
+    def auto_run(self, plain_crib: str, cipher_crib: str):
+        """Sets the plain and cipher crib attributes and then runs the Bombe simulator as usual.
+
+        Parameters
+        ----------
+        plain_crib: str
+            The plain crib.
+        cipher_crib: str
+            The cipher crib.
+
+        Returns
+        -------
+        list[str]
+            A list of strings each containing information of all the stops found.
+        """
         self.crib = (plain_crib, cipher_crib)
         return self.run()
 
-    # Function that geneates steckers and checks if they are consistent
-    def generate_steckers(self, path, outputs, consistent_letter):
+    def generate_steckers(self, path: str, outputs: list[str], consistent_letter: str):
+        """Generates which letters are plugged to which others.
+
+        Parameters
+        ----------
+        path: str
+            The path of the closure the DFS process took to get this potential stop
+        outputs: list[str]
+            The outputs from each edge traversal in the DFS process.
+        consistent_letter: str
+            The letter that stayed the same after encrypting through the closure.
+
+        Returns
+        -------
+        None
+        """
+
         # Construct the steckering
         for i in range(len(outputs)):
             # Extract the steckering from the outputs
@@ -329,7 +387,20 @@ class Bombe():
                 consistent_letter)]] += path[i % len(self.scramblers)]
 
     # Function that check if given steckers have no contradictions
-    def check_steckers(self, steckers):
+    def check_steckers(self, steckers: dict[str, str]):
+        """Checks if the given steckers have no contradictions.
+
+        Parameters
+        ----------
+        steckers: dict[str, str]
+            A dictionary of which letters are plugged to each other.
+
+        Returns
+        -------
+        bool
+            True if steckers are consistent ie each key has one unique value, otherwise False.
+        """
+
         # Check if there are any steckers at all
         values = ''.join(steckers.values())
         if (len(steckers.keys()) and len(values)):
@@ -352,8 +423,37 @@ class Bombe():
         else:
             return False
 
-    # Recursive function that creates tree paths using DFS
-    def dfs(self, v, parent, visited, path, dfs_tree_paths, to_scramble):
+    def dfs(
+        self,
+        v: str,
+        parent: int,
+        visited: dict[str, bool],
+        path: str,
+        dfs_tree_paths: dict[str, list[str]],
+        to_scramble: str
+    ):
+        """Recursive function that creates tree paths using DFS.
+
+        Parameters
+        ----------
+        v: str
+            The current node in the DFS traversal.
+        parent: int
+            The current node's parent
+        visited: dict[str, bool]
+            A dictionary keeping track of which nodes have been visited.
+        path: str
+            The current path of traversal.
+        dfs_tree_paths: dict[str, list[str]]
+            A dictionary containing paths as keys and outputs from the paths as values.
+        to_scramble: str
+            The current string to scramble.
+
+
+        Returns
+        -------
+        None
+        """
 
         # Record that node v has been visited
         visited[v] = True
@@ -400,16 +500,43 @@ class Bombe():
 
     # Function that returns the encryption of the input
     # through a scrambler whose starting letters are given
-    def scramble(self, starting_letters, input):
+    def scramble(self, starting_letters: str, input_str: str):
+        """Scrambles the input string
+
+        Parameters
+        ----------
+        starting_letters: str
+            Three letters denoting the starting letters of the scrambler rotors. Leftmost rotor's name specified first.
+        input_str: str
+            The string to scramble.
+
+
+        Returns
+        -------
+        str
+            The encrypted text.
+        """
 
         # Find the index of the scrambler whose starting letters are the ones given
         scrambler_idx = [''.join(x.starting_letters) for x in self.scramblers].index(
             starting_letters)
 
         # Return the output of scrambling the input through the scrambler
-        return self.scramblers[scrambler_idx].encrypt(input)
+        return self.scramblers[scrambler_idx].encrypt(input_str)
 
     def print_steckers(self):
+        """Prints the steckers.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        to_print: str
+            The string to print the steckers nicely.
+
+        """
         to_print = ''
         for s in self.steckers.keys():
             if ((len(self.steckers[s]) > 0) and (s not in to_print)):
@@ -417,6 +544,20 @@ class Bombe():
         return to_print
 
     def adjust_ring_start_letters(self):
+        """Adjusts the ring settings of a stop so that the turnover point is as far from the beginning as possible.
+
+        Paramaters
+        ----------
+        None
+
+        Returns
+        -------
+        adjusted_ring_settings: list[str]
+            The three ring settings the Enigma should be set up with for this stop. Leftmost rotor's setting is specified first.
+        adjusted_starting_letters: list[str]
+            The three starting letter the Enigma should be set up with for this stop. Leftmost rotor's starting letter is specified first.
+        """
+
         r_ring = self.indicator.b_rotor.current_letter()
 
         # Find the position in the alphabet the right hand rotor's notch is located
